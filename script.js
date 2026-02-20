@@ -4,15 +4,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const cursor = document.querySelector('.cursor');
     const follower = document.querySelector('.cursor-follower');
 
-    document.addEventListener('mousemove', (e) => {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
+    // Check if device is touch-enabled
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-        setTimeout(() => {
-            follower.style.left = e.clientX - 11 + 'px';
-            follower.style.top = e.clientY - 11 + 'px';
-        }, 50);
-    });
+    if (isTouchDevice) {
+        cursor.style.display = 'none';
+        follower.style.display = 'none';
+        document.documentElement.style.cursor = 'auto';
+    } else {
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+
+            setTimeout(() => {
+                follower.style.left = e.clientX - 11 + 'px';
+                follower.style.top = e.clientY - 11 + 'px';
+            }, 50);
+        });
+    }
 
     // Expand cursor on hover
     const links = document.querySelectorAll('a, button, .service-card, .work-item');
@@ -46,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('revealed');
+                // Don't unobserve if we want animations to repeat, but usually keeping it adds performance
                 revealObserver.unobserve(entry.target);
             }
         });
@@ -94,8 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Smooth Scroll for Nav Links
-    document.querySelectorAll('.nav-link').forEach(anchor => {
+    // Smooth Scroll for Nav Links & Premium Button
+    document.querySelectorAll('.nav-link, .btn-premium-blink').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
