@@ -574,11 +574,15 @@ section {
     align-items: center;
 }
 
+
 .contact-info {
     margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.phone-link {
+.contact-link {
     display: inline-flex;
     align-items: center;
     gap: 1rem;
@@ -589,7 +593,7 @@ section {
     transition: var(--transition);
 }
 
-.phone-link i {
+.contact-link i {
     color: var(--accent-color);
     background: var(--glass-bg);
     width: 50px;
@@ -599,18 +603,40 @@ section {
     justify-content: center;
     border-radius: 50%;
     border: 1px solid var(--glass-border);
+    flex-shrink: 0;
 }
 
-.phone-link:hover {
+.contact-link:hover {
     color: var(--accent-color);
     transform: translateX(10px);
 }
 
-.phone-link:hover i {
+.contact-link:hover i {
     background: var(--accent-color);
     color: white;
     border-color: var(--accent-color);
     box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.footer-contact {
+    margin-top: 1.5rem;
+}
+
+.footer-contact a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    transition: var(--transition);
+}
+
+.footer-contact a i {
+    color: var(--accent-color);
+}
+
+.footer-contact a:hover {
+    color: var(--text-color);
 }
 
 /* Footer Icons Alignment with WhatsApp */
