@@ -104,8 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Smooth Scroll for Nav Links & Premium Button
-    document.querySelectorAll('.nav-link, .btn-premium-blink').forEach(anchor => {
+    // Smooth Scroll for Nav Links, Premium Button, and Hero Buttons
+    document.querySelectorAll('.nav-link, .btn-premium-blink, .hero-btns a').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
