@@ -228,6 +228,32 @@
         </div>
     </footer>
 
+    <div id="chat-widget" class="chat-widget">
+        <div id="chat-window" class="chat-window">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <span class="status-dot"></span>
+                    ZARO Assistant
+                </div>
+                <button id="close-chat" class="close-chat"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="chat-messages" class="chat-messages">
+                <!-- Messages will appear here -->
+            </div>
+            <div id="chat-suggestions" class="chat-suggestions">
+                <!-- Suggestions will appear here -->
+            </div>
+            <div class="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off">
+                <button id="send-chat"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <button id="chat-toggle" class="chat-toggle">
+            <i class="fas fa-comment-dots"></i>
+            <span class="notification-dot"></span>
+        </button>
+    </div>
+
     <script src="script.js"></script>
 </body>
 
