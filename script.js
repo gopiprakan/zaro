@@ -72,15 +72,16 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(style);
 
     // Google Apps Script Form Submission
-    const contactForm = document.getElementById('contact-form');
-    if (contactForm) {
-        const scriptURL = "https://script.google.com/macros/s/AKfycbzVwqqyHvWXjrUyM337VxJhAlXa2VqK_pwcMdsE2Fs5WXnVzBTojBvd-bGeUyDaOKFNCw/exec";
+    const clientForm = document.getElementById('clientForm');
+    if (clientForm) {
+        const scriptURL = "https://script.google.com/macros/s/AKfycbxSOaLAXznEiY6nblFqF4eF8eh2SPgJCVBya8xfVnavcuTjeszu4E87AfG1XfUUgTGYBA/exec";
         
-        contactForm.addEventListener('submit', (e) => {
+        clientForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const btn = contactForm.querySelector('button');
+            const btn = clientForm.querySelector('button');
             const originalText = btn.innerHTML;
 
+            // UI Feedback: Loading state
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
             btn.disabled = true;
 
@@ -94,17 +95,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             fetch(scriptURL, {
                 method: "POST",
-                mode: "no-cors",
-                cache: "no-cache",
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8",
-                },
                 body: JSON.stringify(data)
             })
-            .then(() => {
+            .then(response => response.text())
+            .then(data => {
+                // UI Feedback: Success state
                 btn.innerHTML = 'Sent Successfully!';
                 btn.style.background = '#10b981';
-                contactForm.reset();
+                alert("Client registered successfully");
+                clientForm.reset();
 
                 setTimeout(() => {
                     btn.innerHTML = originalText;
