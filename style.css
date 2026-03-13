@@ -53,8 +53,6 @@
 
 html {
     scroll-behavior: smooth;
-    cursor: none;
-    /* Hide default cursor for custom one */
 }
 
 body {
@@ -65,36 +63,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Custom Cursor */
-.cursor {
-    width: 8px;
-    height: 8px;
-    background: var(--accent-color);
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-}
-
-.cursor-follower {
-    width: 30px;
-    height: 30px;
-    border: 1px solid var(--accent-color);
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    z-index: 9998;
-    transition: transform 0.1s ease-out;
-}
-
-/* Hide cursor on touch devices / mobile */
-@media (hover: none) and (pointer: coarse) {
-
-    .cursor,
-    .cursor-follower {
-        display: none !important;
-    }
-}
 
 /* Navbar */
 #navbar {

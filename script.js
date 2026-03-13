@@ -1,27 +1,5 @@
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Custom Cursor
-    const cursor = document.querySelector('.cursor');
-    const follower = document.querySelector('.cursor-follower');
-
-    // Check if device is touch-enabled
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-
-    if (isTouchDevice) {
-        cursor.style.display = 'none';
-        follower.style.display = 'none';
-        document.documentElement.style.cursor = 'auto';
-    } else {
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-
-            setTimeout(() => {
-                follower.style.left = e.clientX - 11 + 'px';
-                follower.style.top = e.clientY - 11 + 'px';
-            }, 50);
-        });
-    }
 
     // --- Mobile Menu Toggle ---
     const mobileMenu = document.getElementById('mobile-menu');
@@ -51,18 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Expand cursor on hover
-    const links = document.querySelectorAll('a, button, .service-card, .work-item');
-    links.forEach(link => {
-        link.addEventListener('mouseenter', () => {
-            follower.style.transform = 'scale(2.5)';
-            follower.style.background = 'rgba(59, 130, 246, 0.1)';
-        });
-        link.addEventListener('mouseleave', () => {
-            follower.style.transform = 'scale(1)';
-            follower.style.background = 'transparent';
-        });
-    });
 
     // Navbar Scroll Effect
     const navbar = document.getElementById('navbar');
