@@ -107,28 +107,58 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
     document.head.appendChild(style);
 
-    // Form Mock Submission
-    const contactForm = document.getElementById('contact-form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
+    // Google Apps Script Form Submission
+    const clientForm = document.getElementById('clientForm');
+    if (clientForm) {
+        const scriptURL = "https://script.google.com/macros/s/AKfycbzVwqqyHvWXjrUyM337VxJhAlXa2VqK_pwcMdsE2Fs5WXnVzBTojBvd-bGeUyDaOKFNCw/exec";
+        
+        clientForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const btn = contactForm.querySelector('button');
+            const btn = clientForm.querySelector('button');
             const originalText = btn.innerHTML;
 
-            btn.innerHTML = 'Sending...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
             btn.disabled = true;
 
-            setTimeout(() => {
-                btn.innerHTML = 'Message Sent!';
+            const data = {
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                project: document.getElementById("project").value,
+                message: document.getElementById("message").value
+            };
+
+            fetch(scriptURL, {
+                method: "POST",
+                mode: "no-cors", // Use no-cors to avoid preflight issues with GAS
+                cache: "no-cache",
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8",
+                },
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                btn.innerHTML = 'Client Registered Successfully!';
                 btn.style.background = '#10b981';
-                contactForm.reset();
+                clientForm.reset();
 
                 setTimeout(() => {
                     btn.innerHTML = originalText;
                     btn.style.background = '';
                     btn.disabled = false;
                 }, 3000);
-            }, 1500);
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                btn.innerHTML = 'Error. Try Again';
+                btn.style.background = '#ef4444';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                    btn.disabled = false;
+                }, 3000);
+            });
         });
     }
 
@@ -165,15 +195,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const userData = {
         name: '',
         email: '',
-        interest: ''
+        phone: '',
+        project: '',
+        message: ''
     };
 
     const botResponses = {
         welcome: "Hi there! 👋 I'm your ZARO assistant. How can I help you today?",
         askName: "To get started, could you tell me your name?",
         askEmail: (name) => `Thanks, ${name}! And what's your email address?`,
-        askInterest: "Great! What kind of project are you looking to build?",
-        finish: "Awesome! I've noted your details. One of our experts will reach out to you within 24 hours. Anything else you'd like to know?",
+        askPhone: "Got it. Could you also share your phone number so we can reach out quickly?",
+        askProject: "What kind of project are you interested in? (e.g., E-commerce, Business Website, Portfolio)",
+        askMessage: "Great! Lastly, any specific requirements or messages for our team?",
+        finish: "Awesome! I've noted all your details. One of our experts will reach out to you within 24 hours. Anything else you'd like to know?",
         contact: "You can reach us directly at <b>9043379569</b> or email <b>zaroweb.in@gmail.com</b>. We're available 24/7!",
         pricing: "Our projects are highly affordable and tailored to your needs. E-commerce shops start at a very competitive rate with lifetime hosting included!"
     };
@@ -259,6 +293,18 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (step === 2) {
             userData.email = text;
             step = 3;
+            addBotMessage(botResponses.askPhone);
+        } else if (step === 3) {
+            userData.phone = text;
+            step = 4;
+            addBotMessage(botResponses.askProject);
+        } else if (step === 4) {
+            userData.project = text;
+            step = 5;
+            addBotMessage(botResponses.askMessage);
+        } else if (step === 5) {
+            userData.message = text;
+            step = 6;
             addBotMessage(botResponses.finish);
             setTimeout(() => showSuggestions(), 2000);
             console.log('Lead captured:', userData); // In a real app, send to server
