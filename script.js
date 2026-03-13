@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileMenu.addEventListener('click', () => {
             mobileMenu.classList.toggle('active');
             navLinksContainer.classList.toggle('mobile-active');
-            
+
             // Disable scroll when menu is open
             if (navLinksContainer.classList.contains('mobile-active')) {
                 document.body.style.overflow = 'hidden';
@@ -74,8 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Google Apps Script Form Submission
     const clientForm = document.getElementById('clientForm');
     if (clientForm) {
-        const scriptURL = "https://script.google.com/macros/s/AKfycbxSOaLAXznEiY6nblFqF4eF8eh2SPgJCVBya8xfVnavcuTjeszu4E87AfG1XfUUgTGYBA/exec";
-        
+        const scriptURL = "https://script.google.com/macros/s/AKfycbyGvVU8pS-LsusSgqxWNXfcNsKEjxXEdCP5FIR5FvsfOCVgJ0fDq1WQuGp7QadGz8Jdqw/exec";
         clientForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const btn = clientForm.querySelector('button');
@@ -97,31 +96,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: "POST",
                 body: JSON.stringify(data)
             })
-            .then(response => response.text())
-            .then(data => {
-                // UI Feedback: Success state
-                btn.innerHTML = 'Sent Successfully!';
-                btn.style.background = '#10b981';
-                alert("Client registered successfully");
-                clientForm.reset();
+                .then(response => response.text())
+                .then(result => {
+                    // UI Feedback: Success state
+                    btn.innerHTML = 'Sent Successfully!';
+                    btn.style.background = '#10b981';
+                    alert("Registration Successful");
+                    clientForm.reset();
 
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.background = '';
-                    btn.disabled = false;
-                }, 3000);
-            })
-            .catch(error => {
-                console.error('Error!', error.message);
-                btn.innerHTML = 'Error. Try Again';
-                btn.style.background = '#ef4444';
-                
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.background = '';
-                    btn.disabled = false;
-                }, 3000);
-            });
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                    }, 3000);
+                })
+                .catch(error => {
+                    console.error('Error!', error.message);
+                    btn.innerHTML = 'Error. Try Again';
+                    btn.style.background = '#ef4444';
+
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                    }, 3000);
+                });
         });
     }
 
