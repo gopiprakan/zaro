@@ -1,5 +1,37 @@
-
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Theme Toggle Logic ---
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    if (document.documentElement.getAttribute('data-theme') === 'light') {
+        if (themeIcon) {
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+        }
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || !document.documentElement.hasAttribute('data-theme');
+            
+            if (isDark) {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                }
+            }
+        });
+    }
+
     // --- Mobile Menu Toggle ---
     const mobileMenu = document.getElementById('mobile-menu');
     const navLinksContainer = document.querySelector('.nav-links');
@@ -84,24 +116,19 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
             btn.disabled = true;
 
-            const data = {
-                name: document.getElementById("name").value,
-                email: document.getElementById("email").value,
-                phone: document.getElementById("phone").value,
-                project: document.getElementById("project").value,
-                message: document.getElementById("message").value
-            };
+            const formData = new FormData(clientForm);
 
             fetch(scriptURL, {
                 method: "POST",
-                body: JSON.stringify(data)
+                body: formData
             })
                 .then(response => response.text())
                 .then(result => {
                     // UI Feedback: Success state
                     btn.innerHTML = 'Sent Successfully!';
                     btn.style.background = '#10b981';
-                    alert("Registration Successful");
+                    // Optional: remove alert or keep it
+                    // alert("Registration Successful");
                     clientForm.reset();
 
                     setTimeout(() => {
@@ -129,16 +156,22 @@ document.addEventListener('DOMContentLoaded', () => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
+            if (!targetId || !targetId.startsWith('#')) return;
+            
             const targetSection = document.querySelector(targetId);
 
-            // Update active state
-            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-            this.classList.add('active');
+            // Update active state only if it's a nav-link
+            if (this.classList.contains('nav-link')) {
+                document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+                this.classList.add('active');
+            }
 
-            window.scrollTo({
-                top: targetSection.offsetTop - 80,
-                behavior: 'smooth'
-            });
+            if (targetSection) {
+                window.scrollTo({
+                    top: targetSection.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+            }
         });
     });
 });
