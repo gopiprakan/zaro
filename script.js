@@ -1,37 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Theme Toggle Logic ---
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeIcon = document.getElementById('theme-icon');
-    
-    if (document.documentElement.getAttribute('data-theme') === 'light') {
-        if (themeIcon) {
-            themeIcon.classList.remove('fa-sun');
-            themeIcon.classList.add('fa-moon');
-        }
-    }
-
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || !document.documentElement.hasAttribute('data-theme');
-            
-            if (isDark) {
-                document.documentElement.setAttribute('data-theme', 'light');
-                localStorage.setItem('theme', 'light');
-                if (themeIcon) {
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
-                }
-            } else {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                localStorage.setItem('theme', 'dark');
-                if (themeIcon) {
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                }
-            }
-        });
-    }
-
     // --- Mobile Menu Toggle ---
     const mobileMenu = document.getElementById('mobile-menu');
     const navLinksContainer = document.querySelector('.nav-links');
@@ -116,19 +83,24 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
             btn.disabled = true;
 
-            const formData = new FormData(clientForm);
+            const data = {
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                project: document.getElementById("project").value,
+                message: document.getElementById("message").value
+            };
 
             fetch(scriptURL, {
                 method: "POST",
-                body: formData
+                body: JSON.stringify(data)
             })
                 .then(response => response.text())
                 .then(result => {
                     // UI Feedback: Success state
                     btn.innerHTML = 'Sent Successfully!';
                     btn.style.background = '#10b981';
-                    // Optional: remove alert or keep it
-                    // alert("Registration Successful");
+                    alert("Registration Successful");
                     clientForm.reset();
 
                     setTimeout(() => {
@@ -156,22 +128,80 @@ document.addEventListener('DOMContentLoaded', () => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
-            if (!targetId || !targetId.startsWith('#')) return;
-            
             const targetSection = document.querySelector(targetId);
 
-            // Update active state only if it's a nav-link
-            if (this.classList.contains('nav-link')) {
-                document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-                this.classList.add('active');
-            }
+            // Update active state
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            this.classList.add('active');
 
-            if (targetSection) {
-                window.scrollTo({
-                    top: targetSection.offsetTop - 80,
-                    behavior: 'smooth'
-                });
-            }
+            window.scrollTo({
+                top: targetSection.offsetTop - 80,
+                behavior: 'smooth'
+            });
         });
     });
+
+    // Review Form Submission Logic
+    const reviewForm = document.getElementById('reviewForm');
+    const reviewsList = document.getElementById('reviewsList');
+
+    if (reviewForm && reviewsList) {
+        // Load reviews from local storage if any
+        const savedReviews = JSON.parse(localStorage.getItem('userReviews')) || [];
+        savedReviews.forEach(review => {
+            const reviewEl = createReviewElement(review.name, review.rating, review.text);
+            reviewsList.appendChild(reviewEl); // Appends to the end
+        });
+
+        reviewForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('reviewerName').value;
+            const ratingInput = document.getElementById('reviewerRating').value;
+            const text = document.getElementById('reviewerText').value;
+
+            // Rating bound logic
+            let rating = parseInt(ratingInput);
+            if (rating < 1) rating = 1;
+            if (rating > 5) rating = 5;
+
+            // 1. Save to local storage
+            const newReview = { name, rating, text };
+            savedReviews.push(newReview);
+            localStorage.setItem('userReviews', JSON.stringify(savedReviews));
+
+            // 2. Add to UI (show at top or bottom depending on preference, we will put it at the bottom below manuals)
+            const reviewEl = createReviewElement(name, rating, text);
+            reviewsList.appendChild(reviewEl);
+
+            // 3. Reset form
+            reviewForm.reset();
+            
+            // 4. Scroll to see the new review smoothly
+            reviewEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+
+        function createReviewElement(name, rating, text) {
+            const card = document.createElement('div');
+            card.className = 'review-card';
+            
+            let starsHtml = '';
+            for (let i = 0; i < 5; i++) {
+                if (i < rating) {
+                    starsHtml += '<i class="fas fa-star"></i>';
+                } else {
+                    starsHtml += '<i class="far fa-star"></i>'; // empty star
+                }
+            }
+
+            card.innerHTML = `
+                <div class="review-header">
+                    <h4>${name}</h4>
+                    <div class="review-rating">${starsHtml}</div>
+                </div>
+                <p>"${text}"</p>
+            `;
+            return card;
+        }
+    }
 });

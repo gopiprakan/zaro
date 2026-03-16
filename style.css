@@ -548,6 +548,98 @@ section {
     font-weight: 500;
 }
 
+/* Reviews Section */
+.reviews-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+}
+
+.review-form-wrapper {
+    background: var(--glass-bg);
+    padding: 3rem;
+    border-radius: 24px;
+    border: 1px solid var(--glass-border);
+}
+
+.review-form-wrapper h3 {
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    color: var(--accent-color);
+}
+
+.review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Custom Scrollbar for Reviews */
+.reviews-list::-webkit-scrollbar {
+    width: 6px;
+}
+.reviews-list::-webkit-scrollbar-track {
+    background: var(--glass-bg);
+    border-radius: 4px;
+}
+.reviews-list::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 4px;
+}
+
+.review-card {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 2rem;
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    transition: var(--transition);
+}
+
+.review-card:hover {
+    border-color: var(--accent-color);
+    transform: translateX(10px);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.review-header h4 {
+    font-size: 1.2rem;
+    color: var(--text-color);
+}
+
+.review-rating {
+    color: #F59E0B;
+    font-size: 0.9rem;
+}
+
+.review-card p {
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 992px) {
+    .reviews-container {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Contact Section */
 .contact-container {
     display: grid;
@@ -801,8 +893,15 @@ footer {
     }
 
     @keyframes menuFadeIn {
-        from { opacity: 0; backdrop-filter: blur(0px); }
-        to { opacity: 1; backdrop-filter: blur(20px); }
+        from {
+            opacity: 0;
+            backdrop-filter: blur(0px);
+        }
+
+        to {
+            opacity: 1;
+            backdrop-filter: blur(20px);
+        }
     }
 
     .menu-toggle {

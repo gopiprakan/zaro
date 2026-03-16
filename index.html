@@ -163,6 +163,53 @@
             </div>
         </section>
 
+        <section id="reviews" class="reviews">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Testimonials</span>
+                    <h2 class="section-title">Client Feedback</h2>
+                </div>
+                
+                <div class="reviews-container">
+                    <!-- Form to submit a new review -->
+                    <div class="review-form-wrapper">
+                        <h3>Leave a Review</h3>
+                        <form id="reviewForm" class="review-form">
+                            <input type="text" id="reviewerName" placeholder="Your Name" required>
+                            <input type="number" id="reviewerRating" placeholder="Rating (1-5)" min="1" max="5" required>
+                            <textarea id="reviewerText" placeholder="Your Feedback" required></textarea>
+                            <button type="submit" class="btn btn-primary">Submit Review</button>
+                        </form>
+                    </div>
+
+                    <!-- List of current reviews -->
+                    <div class="reviews-list" id="reviewsList">
+                        <!-- Manual Entry 1 -->
+                        <div class="review-card">
+                            <div class="review-header">
+                                <h4>Sarah Johnson</h4>
+                                <div class="review-rating">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                            <p>"Zaro's web development services are absolutely top-notch! The communication and speed of delivery were amazing."</p>
+                        </div>
+                        
+                        <!-- Manual Entry 2 -->
+                        <div class="review-card">
+                            <div class="review-header">
+                                <h4>Michael Smith</h4>
+                                <div class="review-rating">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                            <p>"The team built an outstanding e-commerce site for us. I highly recommend them to anyone looking for premium service."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="contact" class="contact">
             <div class="container">
                 <div class="contact-container">
