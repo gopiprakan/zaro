@@ -176,7 +176,13 @@
                         <form id="reviewForm" class="review-form">
                             <h2>Leave a Review</h2>
                             <input type="text" id="name" placeholder="Your Name" required>
-                            <input type="number" id="rating" placeholder="Rating (1-5)" min="1" max="5" required>
+                            <select id="rating" class="form-select" required>
+                                <option value="5">⭐⭐⭐⭐⭐</option>
+                                <option value="4">⭐⭐⭐⭐</option>
+                                <option value="3">⭐⭐⭐</option>
+                                <option value="2">⭐⭐</option>
+                                <option value="1">⭐</option>
+                            </select>
                             <textarea id="feedback" placeholder="Your Feedback" required></textarea>
                             <button type="submit" class="btn btn-primary">Submit Review</button>
                         </form>
