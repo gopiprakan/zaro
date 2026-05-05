@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.disabled = true;
 
             const data = {
-                name: document.getElementById("name").value,
+                name: clientForm.querySelector('[id="name"], [name="name"]').value,
                 email: document.getElementById("email").value,
                 phone: document.getElementById("phone").value,
                 project: document.getElementById("project").value,
@@ -156,9 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
         reviewForm.addEventListener('submit', function (e) {
             e.preventDefault();
 
-            const name = document.getElementById('reviewerName').value;
-            const ratingInput = document.getElementById('reviewerRating').value;
-            const text = document.getElementById('reviewerText').value;
+            const name = reviewForm.querySelector('#name').value;
+            const ratingInput = reviewForm.querySelector('#rating').value;
+            const text = reviewForm.querySelector('#feedback').value;
 
             // Rating bound logic
             let rating = parseInt(ratingInput);
