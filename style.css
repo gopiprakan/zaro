@@ -1,12 +1,14 @@
 :root {
-    --bg-color: #050505;
+    --bg-color: #030014;
     --text-color: #ffffff;
-    --accent-color: #3b82f6;
-    --accent-glow: rgba(59, 130, 246, 0.4);
-    --secondary-color: #1a1a1a;
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    --text-secondary: #94a3b8;
+    --accent-color: #8b5cf6;
+    --accent-secondary: #ec4899;
+    --accent-glow: rgba(139, 92, 246, 0.5);
+    --secondary-color: #0f172a;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     --font-main: 'Outfit', sans-serif;
     --font-serif: 'Playfair Display', serif;
 }
@@ -57,11 +59,20 @@ html {
 }
 
 body {
-    background-color: var(--bg-color);
+    background: radial-gradient(circle at top, #1e1b4b 0%, var(--bg-color) 70%);
     color: var(--text-color);
     font-family: var(--font-main);
     line-height: 1.6;
     overflow-x: hidden;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
 }
 
 /* Navbar */
@@ -99,7 +110,7 @@ body {
 }
 
 .logo span {
-    color: var(--accent-color);
+    color: var(--accent-secondary);
 }
 
 .nav-links {
@@ -284,7 +295,10 @@ section {
     font-family: var(--font-serif);
     font-style: italic;
     font-weight: 700;
-    color: var(--accent-color);
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
 }
 
 .hero-subtitle {
@@ -318,6 +332,7 @@ section {
     height: 400px;
     top: -100px;
     right: -100px;
+    background: var(--accent-color);
     animation: float 20s infinite alternate;
 }
 
@@ -326,7 +341,7 @@ section {
     height: 300px;
     bottom: -50px;
     left: -50px;
-    background: #7c3aed;
+    background: var(--accent-secondary);
     animation: float 25s infinite alternate-reverse;
 }
 
@@ -335,7 +350,7 @@ section {
     height: 250px;
     top: 50%;
     left: 20%;
-    background: #ec4899;
+    background: #06b6d4;
     animation: float 18s infinite alternate;
 }
 
