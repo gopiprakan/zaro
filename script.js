@@ -246,22 +246,42 @@ document.addEventListener('DOMContentLoaded', () => {
             loginForm.classList.remove('active');
         });
         
-        // Prevent form submissions for demo purposes
+        // Handle form submissions to simulate login/signup
         if (loginForm) {
             loginForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                alert('Login functionality would be processed here.');
+                const emailInput = loginForm.querySelector('input[type="email"]').value;
+                const name = emailInput.split('@')[0] || 'User';
+                
+                // Close modal
                 authModal.classList.remove('active');
                 document.body.style.overflow = 'auto';
+                
+                // Show profile
+                document.getElementById('loginBtn').style.display = 'none';
+                const userProfile = document.getElementById('userProfile');
+                userProfile.style.display = 'flex';
+                document.getElementById('userNameDisplay').textContent = name;
+                document.getElementById('profileImg').src = `https://ui-avatars.com/api/?name=${name}&background=random&color=fff`;
             });
         }
         
         if (signupForm) {
             signupForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                alert('Sign Up functionality would be processed here.');
+                const nameInput = signupForm.querySelector('input[type="text"]').value;
+                const name = nameInput || 'User';
+
+                // Close modal
                 authModal.classList.remove('active');
                 document.body.style.overflow = 'auto';
+                
+                // Show profile
+                document.getElementById('loginBtn').style.display = 'none';
+                const userProfile = document.getElementById('userProfile');
+                userProfile.style.display = 'flex';
+                document.getElementById('userNameDisplay').textContent = name;
+                document.getElementById('profileImg').src = `https://ui-avatars.com/api/?name=${name}&background=random&color=fff`;
             });
         }
     }
