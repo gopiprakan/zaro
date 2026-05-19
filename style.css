@@ -633,7 +633,8 @@ section {
     gap: 2rem;
     max-height: 600px;
     overflow-y: auto;
-    padding-right: 10px;
+    overflow-x: hidden;
+    padding: 15px 30px 30px 15px;
 }
 
 /* Custom Scrollbar for Reviews */
