@@ -204,4 +204,65 @@ document.addEventListener('DOMContentLoaded', () => {
             return card;
         }
     }
+
+    // Auth Modal Logic
+    const loginBtn = document.getElementById('loginBtn');
+    const authModal = document.getElementById('authModal');
+    const closeAuthModal = document.getElementById('closeAuthModal');
+    const tabLogin = document.getElementById('tabLogin');
+    const tabSignup = document.getElementById('tabSignup');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+
+    if (loginBtn && authModal) {
+        loginBtn.addEventListener('click', () => {
+            authModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        closeAuthModal.addEventListener('click', () => {
+            authModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) {
+                authModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        tabLogin.addEventListener('click', () => {
+            tabLogin.classList.add('active');
+            tabSignup.classList.remove('active');
+            loginForm.classList.add('active');
+            signupForm.classList.remove('active');
+        });
+
+        tabSignup.addEventListener('click', () => {
+            tabSignup.classList.add('active');
+            tabLogin.classList.remove('active');
+            signupForm.classList.add('active');
+            loginForm.classList.remove('active');
+        });
+        
+        // Prevent form submissions for demo purposes
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Login functionality would be processed here.');
+                authModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        }
+        
+        if (signupForm) {
+            signupForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Sign Up functionality would be processed here.');
+                authModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        }
+    }
 });

@@ -27,8 +27,13 @@
                 <li><a href="#work" class="nav-link">Work</a></li>
                 <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
-            <div class="nav-cta">
-                <a href="#contact" class="btn btn-premium-blink">Start Project</a>
+            <div class="nav-controls">
+                <div class="nav-cta">
+                    <a href="#contact" class="btn btn-premium-blink">Start Project</a>
+                </div>
+                <button class="login-btn" id="loginBtn" aria-label="Sign In" title="Sign In">
+                    <i class="fas fa-user-circle"></i>
+                </button>
             </div>
             <div class="menu-toggle" id="mobile-menu">
                 <span class="bar"></span>
@@ -286,6 +291,41 @@
             </div>
         </div>
     </footer>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal-overlay">
+        <div class="modal-content auth-modal">
+            <span class="close-modal" id="closeAuthModal">&times;</span>
+            <div class="modal-header">
+                <button class="auth-tab active" id="tabLogin">Sign In</button>
+                <button class="auth-tab" id="tabSignup">Sign Up</button>
+            </div>
+            
+            <form id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <input type="email" placeholder="Email Address" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+                <p class="form-footer">Forgot your password? <a href="#">Reset it</a></p>
+            </form>
+
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <input type="text" placeholder="Full Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" placeholder="Email Address" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+            </form>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
