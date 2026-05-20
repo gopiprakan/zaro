@@ -1,10 +1,10 @@
 :root {
-    --bg-color: #030014;
-    --text-color: #ffffff;
+    --bg-color: #020617;
+    --text-color: #f1f5f9;
     --text-secondary: #94a3b8;
-    --accent-color: #8b5cf6;
-    --accent-secondary: #ec4899;
-    --accent-glow: rgba(139, 92, 246, 0.5);
+    --accent-color: #0ea5e9;
+    --accent-secondary: #3b82f6;
+    --accent-glow: rgba(14, 165, 233, 0.5);
     --secondary-color: #0f172a;
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
@@ -59,7 +59,7 @@ html {
 }
 
 body {
-    background: radial-gradient(circle at top, #1e1b4b 0%, var(--bg-color) 70%);
+    background: radial-gradient(circle at top, #082f49 0%, var(--bg-color) 70%);
     color: var(--text-color);
     font-family: var(--font-main);
     line-height: 1.6;
@@ -350,7 +350,7 @@ section {
     height: 250px;
     top: 50%;
     left: 20%;
-    background: #06b6d4;
+    background: #2dd4bf;
     animation: float 18s infinite alternate;
 }
 
