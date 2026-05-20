@@ -69,61 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
-    // Intersection Observer for Reveal Animations
-    const observerOptions = {
-        threshold: 0.08
-    };
-
-    let staggerQueue = [];
-    let staggerTimeout = null;
-
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const target = entry.target;
-                if (target.classList.contains('service-card') || 
-                    target.classList.contains('work-item') || 
-                    target.classList.contains('process-step')) {
-                    
-                    staggerQueue.push(target);
-                    revealObserver.unobserve(target);
-
-                    if (!staggerTimeout) {
-                        staggerTimeout = setTimeout(() => {
-                            staggerQueue.forEach((el, index) => {
-                                setTimeout(() => {
-                                    el.classList.add('revealed');
-                                }, index * 100); // Stagger cards by 100ms
-                            });
-                            staggerQueue = [];
-                            staggerTimeout = null;
-                        }, 50);
-                    }
-                } else {
-                    target.classList.add('revealed');
-                    revealObserver.unobserve(target);
-                }
-            }
-        });
-    }, observerOptions);
-
-    const revealElements = document.querySelectorAll('.service-card, .work-item, .section-header, .process-step');
-    revealElements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(25px)';
-        el.style.transition = 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
-        revealObserver.observe(el);
-    });
-
-    // Add styles for revealed elements dynamically
-    const style = document.createElement('style');
-    style.innerHTML = `
-        .revealed {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
-        }
-    `;
-    document.head.appendChild(style);
+    // --- Reveal Animations (initialized at the bottom to ensure DOM settlement) ---
 
     // Google Apps Script Form Submission
     const clientForm = document.getElementById('clientForm');
@@ -226,12 +172,18 @@ document.addEventListener('DOMContentLoaded', () => {
             savedReviews.push(newReview);
             localStorage.setItem('userReviews', JSON.stringify(savedReviews));
 
-            // 2. Add to UI (show at top or bottom depending on preference, we will put it at the bottom below manuals)
+            // 2. Add to UI with a gorgeous fade-in slide transition
             const reviewEl = createReviewElement(name, rating, text);
+            reviewEl.classList.add('stagger-item');
             reviewsList.appendChild(reviewEl);
+            
+            // Force reflow and add revealed class for smooth, premium transition
+            reviewEl.getBoundingClientRect();
+            reviewEl.classList.add('revealed');
 
-            // 3. Reset form
+            // 3. Reset form and show success toast
             reviewForm.reset();
+            showToast("Thank you for your feedback!", "success");
             
             // 4. Scroll to see the new review smoothly
             reviewEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -319,6 +271,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 userProfile.style.display = 'flex';
                 document.getElementById('userNameDisplay').textContent = name;
                 document.getElementById('profileImg').src = `https://ui-avatars.com/api/?name=${name}&background=random&color=fff`;
+                
+                showToast(`Welcome back, ${name}!`, "success");
             });
         }
         
@@ -338,7 +292,129 @@ document.addEventListener('DOMContentLoaded', () => {
                 userProfile.style.display = 'flex';
                 document.getElementById('userNameDisplay').textContent = name;
                 document.getElementById('profileImg').src = `https://ui-avatars.com/api/?name=${name}&background=random&color=fff`;
+                
+                showToast(`Account created successfully! Welcome, ${name}.`, "success");
             });
         }
+    }
+
+    // --- Premium Dynamic Scroll Reveal System ---
+    // Inject reveal styles dynamically
+    const style = document.createElement('style');
+    style.innerHTML = `
+        /* Dynamic scroll reveal animations */
+        .reveal-element {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-element.revealed {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+        .stagger-item {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .stagger-item.revealed {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+        
+        /* Hero entry page load animations */
+        .hero-title, .hero-subtitle, .hero-btns {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .hero-title.loaded, .hero-subtitle.loaded, .hero-btns.loaded {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Staggered containers and their children initialization
+    const staggerConfigs = [
+        { container: '.services-grid', children: '.service-card' },
+        { container: '.process-list', children: '.process-step' },
+        { container: '.work-grid', children: '.work-item' },
+        { container: '.reviews-list', children: '.review-card' }
+    ];
+
+    staggerConfigs.forEach(config => {
+        const container = document.querySelector(config.container);
+        if (container) {
+            container.classList.add('stagger-container');
+            const items = container.querySelectorAll(config.children);
+            items.forEach(item => {
+                item.classList.add('stagger-item');
+            });
+        }
+    });
+
+    // Individual elements reveal initialization
+    const individualSelectors = [
+        '.section-header',
+        '.contact-content',
+        '.contact-form',
+        '.review-form-wrapper'
+    ];
+
+    individualSelectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+            el.classList.add('reveal-element');
+        });
+    });
+
+    // Intersection Observer for Reveal Animations
+    const observerOptions = {
+        threshold: 0.05,
+        rootMargin: '0px 0px -50px 0px' // Triggers slightly before element is fully in frame
+    };
+
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const target = entry.target;
+                
+                if (target.classList.contains('stagger-container')) {
+                    const items = target.querySelectorAll('.stagger-item:not(.revealed)');
+                    items.forEach((item, index) => {
+                        setTimeout(() => {
+                            item.classList.add('revealed');
+                        }, index * 120); // 120ms staggered delay between items
+                    });
+                    revealObserver.unobserve(target);
+                } else if (target.classList.contains('reveal-element')) {
+                    target.classList.add('revealed');
+                    revealObserver.unobserve(target);
+                }
+            }
+        });
+    }, observerOptions);
+
+    // Register all reveal triggers
+    document.querySelectorAll('.stagger-container, .reveal-element').forEach(el => {
+        revealObserver.observe(el);
+    });
+
+    // Hero entry page-load animations triggered sequentially
+    const heroTitle = document.querySelector('.hero-title');
+    const heroSubtitle = document.querySelector('.hero-subtitle');
+    const heroBtns = document.querySelector('.hero-btns');
+
+    if (heroTitle && heroSubtitle && heroBtns) {
+        setTimeout(() => {
+            heroTitle.classList.add('loaded');
+        }, 150);
+        setTimeout(() => {
+            heroSubtitle.classList.add('loaded');
+        }, 350);
+        setTimeout(() => {
+            heroBtns.classList.add('loaded');
+        }, 550);
     }
 });
