@@ -13,3 +13,4 @@
         }
     ]
 }
+//npx -y http-server -p 3000
