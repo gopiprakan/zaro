@@ -37,17 +37,72 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Toast Notification System ---
+    function showToast(message, type = 'success') {
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        
+        toast.innerHTML = `
+            <i class="fas ${icon}"></i>
+            <span>${message}</span>
+        `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 50);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.remove();
+            }, 400);
+        }, 4000);
+    }
+
     // Intersection Observer for Reveal Animations
     const observerOptions = {
-        threshold: 0.1
+        threshold: 0.08
     };
+
+    let staggerQueue = [];
+    let staggerTimeout = null;
 
     const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('revealed');
-                // Don't unobserve if we want animations to repeat, but usually keeping it adds performance
-                revealObserver.unobserve(entry.target);
+                const target = entry.target;
+                if (target.classList.contains('service-card') || 
+                    target.classList.contains('work-item') || 
+                    target.classList.contains('process-step')) {
+                    
+                    staggerQueue.push(target);
+                    revealObserver.unobserve(target);
+
+                    if (!staggerTimeout) {
+                        staggerTimeout = setTimeout(() => {
+                            staggerQueue.forEach((el, index) => {
+                                setTimeout(() => {
+                                    el.classList.add('revealed');
+                                }, index * 100); // Stagger cards by 100ms
+                            });
+                            staggerQueue = [];
+                            staggerTimeout = null;
+                        }, 50);
+                    }
+                } else {
+                    target.classList.add('revealed');
+                    revealObserver.unobserve(target);
+                }
             }
         });
     }, observerOptions);
@@ -55,8 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const revealElements = document.querySelectorAll('.service-card, .work-item, .section-header, .process-step');
     revealElements.forEach(el => {
         el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = 'all 0.8s cubic-bezier(0.23, 1, 0.32, 1)';
+        el.style.transform = 'translateY(25px)';
+        el.style.transition = 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
         revealObserver.observe(el);
     });
 
@@ -98,9 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(response => response.text())
                 .then(result => {
                     // UI Feedback: Success state
-                    btn.innerHTML = 'Sent Successfully!';
+                    btn.innerHTML = '<i class="fas fa-check"></i> Sent Successfully!';
                     btn.style.background = '#10b981';
-                    alert("Registration Successful");
+                    showToast("Registration Successful! We will contact you soon.", "success");
                     clientForm.reset();
 
                     setTimeout(() => {
@@ -113,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('Error!', error.message);
                     btn.innerHTML = 'Error. Try Again';
                     btn.style.background = '#ef4444';
+                    showToast("Error. Please try again or email us directly.", "error");
 
                     setTimeout(() => {
                         btn.innerHTML = originalText;
