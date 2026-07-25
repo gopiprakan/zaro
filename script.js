@@ -1,3 +1,21 @@
+import { auth, db, googleProvider } from './firebase-config.js';
+import {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    updateProfile,
+    signInWithPopup
+} from 'firebase/auth';
+import {
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    orderBy,
+    serverTimestamp
+} from 'firebase/firestore';
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- Mobile Menu Toggle ---
     const mobileMenu = document.getElementById('mobile-menu');
@@ -143,50 +161,78 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Review Form Submission Logic
+    // Review Form Submission Logic & Firestore Integration
     const reviewForm = document.getElementById('reviewForm');
     const reviewsList = document.getElementById('reviewsList');
 
     if (reviewForm && reviewsList) {
-        // Load reviews from local storage if any
-        const savedReviews = JSON.parse(localStorage.getItem('userReviews')) || [];
-        savedReviews.forEach(review => {
-            const reviewEl = createReviewElement(review.name, review.rating, review.text);
-            reviewsList.appendChild(reviewEl); // Appends to the end
-        });
+        // Load reviews from Firestore
+        const loadReviews = async () => {
+            try {
+                const q = query(collection(db, "reviews"), orderBy("timestamp", "asc"));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach((doc) => {
+                    const review = doc.data();
+                    if (review.name && review.feedback) {
+                        const reviewEl = createReviewElement(review.name, review.rating || 5, review.feedback);
+                        reviewEl.classList.add('stagger-item', 'revealed');
+                        reviewsList.appendChild(reviewEl);
+                    }
+                });
+            } catch (err) {
+                console.error("Error loading reviews:", err);
+            }
+        };
 
-        reviewForm.addEventListener('submit', function (e) {
+        loadReviews();
+
+        reviewForm.addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            const name = reviewForm.querySelector('#name').value;
+            const name = reviewForm.querySelector('#name').value.trim();
             const ratingInput = reviewForm.querySelector('#rating').value;
-            const text = reviewForm.querySelector('#feedback').value;
+            const text = reviewForm.querySelector('#feedback').value.trim();
 
-            // Rating bound logic
             let rating = parseInt(ratingInput);
             if (rating < 1) rating = 1;
             if (rating > 5) rating = 5;
 
-            // 1. Save to local storage
-            const newReview = { name, rating, text };
-            savedReviews.push(newReview);
-            localStorage.setItem('userReviews', JSON.stringify(savedReviews));
+            const submitBtn = reviewForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
 
-            // 2. Add to UI with a gorgeous fade-in slide transition
-            const reviewEl = createReviewElement(name, rating, text);
-            reviewEl.classList.add('stagger-item');
-            reviewsList.appendChild(reviewEl);
-            
-            // Force reflow and add revealed class for smooth, premium transition
-            reviewEl.getBoundingClientRect();
-            reviewEl.classList.add('revealed');
+            try {
+                // Save to Firestore
+                await addDoc(collection(db, "reviews"), {
+                    name,
+                    rating,
+                    feedback: text,
+                    timestamp: serverTimestamp()
+                });
 
-            // 3. Reset form and show success toast
-            reviewForm.reset();
-            showToast("Thank you for your feedback!", "success");
-            
-            // 4. Scroll to see the new review smoothly
-            reviewEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                // Add to UI with a gorgeous fade-in slide transition
+                const reviewEl = createReviewElement(name, rating, text);
+                reviewEl.classList.add('stagger-item');
+                reviewsList.appendChild(reviewEl);
+                
+                // Force reflow and add revealed class for smooth, premium transition
+                reviewEl.getBoundingClientRect();
+                reviewEl.classList.add('revealed');
+
+                // Reset form and show success toast
+                reviewForm.reset();
+                showToast("Thank you for your feedback!", "success");
+                
+                // Scroll to see the new review smoothly
+                reviewEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } catch (err) {
+                console.error("Error adding review:", err);
+                showToast("Could not submit review. Please try again.", "error");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
         });
 
         function createReviewElement(name, rating, text) {
@@ -213,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Auth Modal Logic
+    // Auth Modal Logic & Firebase Auth Integration
     const loginBtn = document.getElementById('loginBtn');
     const authModal = document.getElementById('authModal');
     const closeAuthModal = document.getElementById('closeAuthModal');
@@ -221,6 +267,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabSignup = document.getElementById('tabSignup');
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
+    const googleSignInBtn = document.getElementById('googleSignInBtn');
+    const userProfile = document.getElementById('userProfile');
+
+    // Monitor Firebase Auth State Changed
+    onAuthStateChanged(auth, (user) => {
+        const loginBtnEl = document.getElementById('loginBtn');
+        const userProfileEl = document.getElementById('userProfile');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const profileImg = document.getElementById('profileImg');
+
+        if (user) {
+            const name = user.displayName || user.email.split('@')[0] || 'User';
+            if (loginBtnEl) loginBtnEl.style.display = 'none';
+            if (userProfileEl) {
+                userProfileEl.style.display = 'flex';
+                userNameDisplay.textContent = name;
+                profileImg.src = user.photoURL || `https://ui-avatars.com/api/?name=${name}&background=random&color=fff`;
+            }
+        } else {
+            if (loginBtnEl) loginBtnEl.style.display = 'inline-flex';
+            if (userProfileEl) userProfileEl.style.display = 'none';
+        }
+    });
+
+    // Sign out confirmation handler on profile click
+    if (userProfile) {
+        userProfile.addEventListener('click', async () => {
+            if (confirm("Do you want to sign out?")) {
+                try {
+                    await signOut(auth);
+                    showToast("Signed out successfully!", "success");
+                } catch (err) {
+                    showToast(err.message, "error");
+                }
+            }
+        });
+    }
 
     if (loginBtn && authModal) {
         loginBtn.addEventListener('click', () => {
@@ -254,46 +337,86 @@ document.addEventListener('DOMContentLoaded', () => {
             loginForm.classList.remove('active');
         });
         
-        // Handle form submissions to simulate login/signup
+        // Handle login form submission
         if (loginForm) {
-            loginForm.addEventListener('submit', (e) => {
+            loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const emailInput = loginForm.querySelector('input[type="email"]').value;
-                const name = emailInput.split('@')[0] || 'User';
+                const emailInput = loginForm.querySelector('input[type="email"]').value.trim();
+                const passwordInput = loginForm.querySelector('input[type="password"]').value;
                 
-                // Close modal
-                authModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-                
-                // Show profile
-                document.getElementById('loginBtn').style.display = 'none';
-                const userProfile = document.getElementById('userProfile');
-                userProfile.style.display = 'flex';
-                document.getElementById('userNameDisplay').textContent = name;
-                document.getElementById('profileImg').src = `https://ui-avatars.com/api/?name=${name}&background=random&color=fff`;
-                
-                showToast(`Welcome back, ${name}!`, "success");
+                const submitBtn = loginForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+
+                try {
+                    await signInWithEmailAndPassword(auth, emailInput, passwordInput);
+                    authModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    loginForm.reset();
+                    showToast("Signed in successfully!", "success");
+                } catch (err) {
+                    console.error("Login failure:", err);
+                    showToast(err.message, "error");
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
             });
         }
         
+        // Handle signup form submission
         if (signupForm) {
-            signupForm.addEventListener('submit', (e) => {
+            signupForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const nameInput = signupForm.querySelector('input[type="text"]').value;
-                const name = nameInput || 'User';
+                const nameInput = signupForm.querySelector('input[placeholder="Full Name"]').value.trim();
+                const emailInput = signupForm.querySelector('input[type="email"]').value.trim();
+                const passwordInput = signupForm.querySelector('input[type="password"]').value;
 
-                // Close modal
-                authModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-                
-                // Show profile
-                document.getElementById('loginBtn').style.display = 'none';
-                const userProfile = document.getElementById('userProfile');
-                userProfile.style.display = 'flex';
-                document.getElementById('userNameDisplay').textContent = name;
-                document.getElementById('profileImg').src = `https://ui-avatars.com/api/?name=${name}&background=random&color=fff`;
-                
-                showToast(`Account created successfully! Welcome, ${name}.`, "success");
+                const submitBtn = signupForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, emailInput, passwordInput);
+                    await updateProfile(userCredential.user, {
+                        displayName: nameInput
+                    });
+                    authModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    signupForm.reset();
+                    showToast(`Account created successfully! Welcome, ${nameInput}.`, "success");
+                } catch (err) {
+                    console.error("Signup failure:", err);
+                    showToast(err.message, "error");
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            });
+        }
+
+        // Handle Google Sign-In
+        if (googleSignInBtn) {
+            googleSignInBtn.addEventListener('click', async () => {
+                const originalText = googleSignInBtn.innerHTML;
+                googleSignInBtn.disabled = true;
+                googleSignInBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+
+                try {
+                    const result = await signInWithPopup(auth, googleProvider);
+                    const user = result.user;
+                    authModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    showToast(`Welcome, ${user.displayName || 'User'}!`, "success");
+                } catch (err) {
+                    console.error("Google login failure:", err);
+                    showToast(err.message, "error");
+                } finally {
+                    googleSignInBtn.disabled = false;
+                    googleSignInBtn.innerHTML = originalText;
+                }
             });
         }
     }

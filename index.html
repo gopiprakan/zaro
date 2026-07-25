@@ -410,10 +410,25 @@
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
             </form>
+
+            <div class="auth-divider"><span>or</span></div>
+            <button id="googleSignInBtn" class="btn btn-google" type="button">
+                <i class="fab fa-google"></i> Sign In with Google
+            </button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Import Map for Firebase Modular SDK -->
+    <script type="importmap">
+      {
+        "imports": {
+          "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+          "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+          "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
+        }
+      }
+    </script>
+    <script type="module" src="script.js"></script>
 </body>
 
 </html>
