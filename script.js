@@ -1,543 +1,606 @@
-import { auth, db, googleProvider } from './firebase-config.js';
-import {
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged,
-    updateProfile,
-    signInWithPopup
-} from 'firebase/auth';
-import {
-    collection,
-    addDoc,
-    getDocs,
-    query,
-    orderBy,
-    serverTimestamp
-} from 'firebase/firestore';
+/**
+ * ZARO PLATFORM & DEMOLY WEB STUDIO - CORE JAVASCRIPT ENGINE
+ */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Mobile Menu Toggle ---
-    const mobileMenu = document.getElementById('mobile-menu');
-    const navLinksContainer = document.querySelector('.nav-links');
-    const navLinksItems = document.querySelectorAll('.nav-link');
 
-    if (mobileMenu) {
-        mobileMenu.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            navLinksContainer.classList.toggle('mobile-active');
+    // =========================================================================
+    // 1. DATA & STATE MANAGEMENT
+    // =========================================================================
 
-            // Disable scroll when menu is open
-            if (navLinksContainer.classList.contains('mobile-active')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = 'auto';
+    const FREELANCERS_DATA = [
+        {
+            id: 1,
+            name: "Alex Rivera",
+            role: "Senior Full Stack & Demoly Engineer",
+            rating: 4.9,
+            reviews: 48,
+            rate: 85,
+            category: "fullstack",
+            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+            tags: ["Demoly Studio", "React", "Node.js", "TailwindCSS"],
+            verified: true
+        },
+        {
+            id: 2,
+            name: "Elena Rostova",
+            role: "UI/UX & Glassmorphism Specialist",
+            rating: 5.0,
+            reviews: 62,
+            rate: 95,
+            category: "design",
+            avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80",
+            tags: ["Figma", "Webtools", "Micro-Animations", "CSS3"],
+            verified: true
+        },
+        {
+            id: 3,
+            name: "Marcus Vance",
+            role: "Demoly Template Architect",
+            rating: 4.8,
+            reviews: 31,
+            rate: 70,
+            category: "demoly",
+            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80",
+            tags: ["Demoly Blocks", "HTML5/CSS3", "JavaScript", "SEO"],
+            verified: true
+        },
+        {
+            id: 4,
+            name: "Sophia Chen",
+            role: "Webtools Integration Engineer",
+            rating: 4.9,
+            reviews: 55,
+            rate: 110,
+            category: "webtools",
+            avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80",
+            tags: ["Shader Gradients", "WebGL", "Canvas API", "Performance"],
+            verified: true
+        }
+    ];
+
+    const BLOCK_TEMPLATES = {
+        hero: `
+        <div class="canvas-block demo-hero-block" data-type="hero">
+            <div class="canvas-block-controls">
+                <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+                <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+                <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
+            </div>
+            <span class="badge badge-cyan" style="margin-bottom: 1rem;"><i class="fas fa-sparkles"></i> Welcome to Next-Gen</span>
+            <h1 class="demo-hero-title">Build Stunning Digital Experiences</h1>
+            <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 2rem;">Customized live with Demoly Studio and powered by high performance design blocks.</p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button class="btn btn-primary">Get Started</button>
+                <button class="btn btn-secondary">Learn More</button>
+            </div>
+        </div>`,
+
+        features: `
+        <div class="canvas-block demo-features-block" data-type="features">
+            <div class="canvas-block-controls">
+                <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+                <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+                <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
+            </div>
+            <div class="demo-feature-card">
+                <i class="fas fa-bolt" style="font-size: 2rem; color: var(--accent-cyan); margin-bottom: 1rem;"></i>
+                <h3>Lightning Fast</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Optimized CSS & minimal JS footprint for top performance scores.</p>
+            </div>
+            <div class="demo-feature-card">
+                <i class="fas fa-magic" style="font-size: 2rem; color: var(--accent-violet); margin-bottom: 1rem;"></i>
+                <h3>Demoly Customizer</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Real-time layout and visual customization directly in browser.</p>
+            </div>
+            <div class="demo-feature-card">
+                <i class="fas fa-shield-alt" style="font-size: 2rem; color: var(--accent-pink); margin-bottom: 1rem;"></i>
+                <h3>Production Ready</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Export clean code ready to host anywhere instantly.</p>
+            </div>
+        </div>`,
+
+        pricing: `
+        <div class="canvas-block demo-pricing-block" data-type="pricing">
+            <div class="canvas-block-controls">
+                <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+                <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+                <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
+            </div>
+            <div class="demo-price-card">
+                <h4>Starter</h4>
+                <h2 style="font-size: 2.2rem; margin: 1rem 0;">$29<span style="font-size: 0.9rem; color: var(--text-muted);">/mo</span></h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Basic site builder access with export tools.</p>
+                <button class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 1.5rem;">Choose Plan</button>
+            </div>
+            <div class="demo-price-card" style="border-color: var(--accent-cyan); background: rgba(6, 182, 212, 0.08);">
+                <span class="badge badge-cyan" style="margin-bottom: 0.5rem;">Popular</span>
+                <h4>Pro Studio</h4>
+                <h2 style="font-size: 2.2rem; margin: 1rem 0;">$79<span style="font-size: 0.9rem; color: var(--text-muted);">/mo</span></h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Demoly studio + custom webtools suite access.</p>
+                <button class="btn btn-primary btn-sm" style="width: 100%; margin-top: 1.5rem;">Choose Plan</button>
+            </div>
+        </div>`,
+
+        footer: `
+        <div class="canvas-block" data-type="footer" style="padding: 3rem 2rem; background: var(--bg-surface); border-top: 1px solid var(--border-glass);">
+            <div class="canvas-block-controls">
+                <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+                <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+                <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="font-weight: 800; font-size: 1.2rem;">ZARO Demoly Site</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">© 2026 Designed with Demoly Web Studio. All rights reserved.</div>
+            </div>
+        </div>`
+    };
+
+    let activeCanvasBlocks = [];
+
+    // =========================================================================
+    // 2. VIEW NAVIGATION & TAB SWITCHER
+    // =========================================================================
+
+    const navTabs = document.querySelectorAll('.tab-btn');
+    const viewSections = document.querySelectorAll('.view-section');
+
+    function switchView(viewId) {
+        viewSections.forEach(sec => {
+            sec.classList.remove('active-view');
+            if (sec.id === viewId) {
+                sec.classList.add('active-view');
             }
         });
 
-        // Close menu when a link is clicked
-        navLinksItems.forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.remove('active');
-                navLinksContainer.classList.remove('mobile-active');
-                document.body.style.overflow = 'auto';
+        navTabs.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-view') === viewId) {
+                btn.classList.add('active');
+            }
+        });
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    navTabs.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetView = btn.getAttribute('data-view');
+            switchView(targetView);
+        });
+    });
+
+    document.getElementById('openBuilderNavBtn')?.addEventListener('click', () => {
+        switchView('view-demoly');
+    });
+
+    document.getElementById('logoBtn')?.addEventListener('click', () => {
+        switchView('view-marketplace');
+    });
+
+    // =========================================================================
+    // 3. FREELANCE MARKETPLACE ENGINE
+    // =========================================================================
+
+    const freelancersGrid = document.getElementById('freelancersGrid');
+    const talentDirectoryGrid = document.getElementById('talentDirectoryGrid');
+    const rateFilter = document.getElementById('rateFilter');
+    const rateFilterVal = document.getElementById('rateFilterVal');
+    const categoryItems = document.querySelectorAll('#categoryFilterList .filter-item');
+    const marketplaceSearch = document.getElementById('marketplaceSearch');
+
+    function renderFreelancerCard(f) {
+        return `
+        <div class="freelancer-card glass-card">
+            <div>
+                <div class="freelancer-header">
+                    <img src="${f.avatar}" alt="${f.name}" class="avatar">
+                    <div class="freelancer-info">
+                        <h3>${f.name} ${f.verified ? '<i class="fas fa-check-circle" style="color:var(--accent-cyan); font-size:0.85rem;"></i>' : ''}</h3>
+                        <p class="freelancer-role">${f.role}</p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--accent-amber); margin-bottom: 0.75rem;">
+                    <i class="fas fa-star"></i>
+                    <strong>${f.rating}</strong>
+                    <span style="color: var(--text-dim);">(${f.reviews} projects)</span>
+                </div>
+                <div class="tags-container">
+                    ${f.tags.map(t => `<span class="skill-tag">${t}</span>`).join('')}
+                </div>
+            </div>
+
+            <div class="freelancer-footer">
+                <div class="rate">$${f.rate} <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">/ hr</span></div>
+                <button class="btn btn-primary btn-sm hire-btn" data-name="${f.name}" data-role="${f.role}">
+                    Hire Freelancer
+                </button>
+            </div>
+        </div>`;
+    }
+
+    function updateMarketplaceGrid() {
+        if (!freelancersGrid) return;
+        const maxRate = parseInt(rateFilter?.value || 150);
+        const activeCategory = document.querySelector('#categoryFilterList .filter-item.active')?.getAttribute('data-cat') || 'all';
+        const searchQuery = (marketplaceSearch?.value || '').toLowerCase();
+
+        const filtered = FREELANCERS_DATA.filter(f => {
+            const matchesRate = f.rate <= maxRate;
+            const matchesCat = activeCategory === 'all' || f.category === activeCategory;
+            const matchesSearch = f.name.toLowerCase().includes(searchQuery) ||
+                f.role.toLowerCase().includes(searchQuery) ||
+                f.tags.some(t => t.toLowerCase().includes(searchQuery));
+            return matchesRate && matchesCat && matchesSearch;
+        });
+
+        freelancersGrid.innerHTML = filtered.map(renderFreelancerCard).join('');
+        if (talentDirectoryGrid) {
+            talentDirectoryGrid.innerHTML = FREELANCERS_DATA.map(renderFreelancerCard).join('');
+        }
+
+        // Attach Hire Button Listeners
+        document.querySelectorAll('.hire-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const name = btn.getAttribute('data-name');
+                const role = btn.getAttribute('data-role');
+                openHireModal(name, role);
             });
         });
     }
 
-    // Navbar Scroll Effect
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
+    rateFilter?.addEventListener('input', (e) => {
+        if (rateFilterVal) rateFilterVal.textContent = `$${e.target.value}/hr`;
+        updateMarketplaceGrid();
     });
 
-    // --- Toast Notification System ---
-    function showToast(message, type = 'success') {
-        let container = document.querySelector('.toast-container');
-        if (!container) {
-            container = document.createElement('div');
-            container.className = 'toast-container';
-            document.body.appendChild(container);
+    categoryItems.forEach(item => {
+        item.addEventListener('click', () => {
+            categoryItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            updateMarketplaceGrid();
+        });
+    });
+
+    marketplaceSearch?.addEventListener('input', updateMarketplaceGrid);
+
+    // Initial render
+    updateMarketplaceGrid();
+
+    // =========================================================================
+    // 4. DEMOLY VISUAL WEBSITE STUDIO (BUILDER ENGINE)
+    // =========================================================================
+
+    const builderCanvas = document.getElementById('builderCanvas');
+    const canvasEmptyState = document.getElementById('canvasEmptyState');
+    const blockPresetCards = document.querySelectorAll('.block-preset-card');
+    const clearCanvasBtn = document.getElementById('clearCanvasBtn');
+    const exportCodeBtn = document.getElementById('exportCodeBtn');
+
+    // Sidebar Tab Switching
+    const tabBlocksBtn = document.getElementById('tabBlocksBtn');
+    const tabThemesBtn = document.getElementById('tabThemesBtn');
+    const sidebarBlocksContent = document.getElementById('sidebarBlocksContent');
+    const sidebarThemesContent = document.getElementById('sidebarThemesContent');
+
+    tabBlocksBtn?.addEventListener('click', () => {
+        tabBlocksBtn.classList.add('active');
+        tabThemesBtn.classList.remove('active');
+        sidebarBlocksContent.style.display = 'block';
+        sidebarThemesContent.style.display = 'none';
+    });
+
+    tabThemesBtn?.addEventListener('click', () => {
+        tabThemesBtn.classList.add('active');
+        tabBlocksBtn.classList.remove('active');
+        sidebarThemesContent.style.display = 'block';
+        sidebarBlocksContent.style.display = 'none';
+    });
+
+    // Viewport Controls
+    const vpDesktop = document.getElementById('vpDesktop');
+    const vpTablet = document.getElementById('vpTablet');
+    const vpMobile = document.getElementById('vpMobile');
+
+    vpDesktop?.addEventListener('click', () => {
+        setViewport('desktop');
+    });
+    vpTablet?.addEventListener('click', () => {
+        setViewport('tablet');
+    });
+    vpMobile?.addEventListener('click', () => {
+        setViewport('mobile');
+    });
+
+    function setViewport(vp) {
+        [vpDesktop, vpTablet, vpMobile].forEach(btn => btn?.classList.remove('active'));
+        builderCanvas.classList.remove('vp-tablet', 'vp-mobile');
+
+        if (vp === 'desktop') {
+            vpDesktop?.classList.add('active');
+        } else if (vp === 'tablet') {
+            vpTablet?.classList.add('active');
+            builderCanvas.classList.add('vp-tablet');
+        } else if (vp === 'mobile') {
+            vpMobile?.classList.add('active');
+            builderCanvas.classList.add('vp-mobile');
+        }
+    }
+
+    // Add Block to Canvas
+    blockPresetCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const blockType = card.getAttribute('data-block-type');
+            if (BLOCK_TEMPLATES[blockType]) {
+                addBlockToCanvas(blockType);
+            }
+        });
+    });
+
+    function addBlockToCanvas(blockType) {
+        if (canvasEmptyState) {
+            canvasEmptyState.style.display = 'none';
         }
 
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = BLOCK_TEMPLATES[blockType].trim();
+        const blockEl = tempDiv.firstChild;
+
+        builderCanvas.appendChild(blockEl);
+        attachBlockEventListeners(blockEl);
+        showToast(`Added ${blockType.toUpperCase()} block to Demoly Canvas!`, 'cyan');
+    }
+
+    function attachBlockEventListeners(blockEl) {
+        const deleteBtn = blockEl.querySelector('.delete-block-btn');
+        const moveUpBtn = blockEl.querySelector('.move-up-btn');
+        const moveDownBtn = blockEl.querySelector('.move-down-btn');
+
+        deleteBtn?.addEventListener('click', () => {
+            blockEl.remove();
+            if (builderCanvas.children.length <= 1) { // 1 accounts for emptyState div
+                if (canvasEmptyState) canvasEmptyState.style.display = 'block';
+            }
+            showToast('Block removed from canvas.', 'info');
+        });
+
+        moveUpBtn?.addEventListener('click', () => {
+            if (blockEl.previousElementSibling && blockEl.previousElementSibling !== canvasEmptyState) {
+                builderCanvas.insertBefore(blockEl, blockEl.previousElementSibling);
+            }
+        });
+
+        moveDownBtn?.addEventListener('click', () => {
+            if (blockEl.nextElementSibling) {
+                builderCanvas.insertBefore(blockEl.nextElementSibling, blockEl);
+            }
+        });
+    }
+
+    clearCanvasBtn?.addEventListener('click', () => {
+        const blocks = builderCanvas.querySelectorAll('.canvas-block');
+        blocks.forEach(b => b.remove());
+        if (canvasEmptyState) canvasEmptyState.style.display = 'block';
+        showToast('Demoly Canvas cleared.', 'info');
+    });
+
+    // Theme Swatch Selector
+    const themeSwatches = document.querySelectorAll('.theme-swatch');
+    themeSwatches.forEach(swatch => {
+        swatch.addEventListener('click', () => {
+            themeSwatches.forEach(s => s.classList.remove('active'));
+            swatch.classList.add('active');
+
+            const theme = swatch.getAttribute('data-theme');
+            if (theme === 'cyan-dark') {
+                builderCanvas.style.background = '#0b0f19';
+            } else if (theme === 'violet-dark') {
+                builderCanvas.style.background = '#0e0b1d';
+            } else if (theme === 'emerald-dark') {
+                builderCanvas.style.background = '#08120e';
+            } else if (theme === 'pink-dark') {
+                builderCanvas.style.background = '#150912';
+            }
+            showToast(`Applied ${swatch.textContent.trim()} Theme`, 'cyan');
+        });
+    });
+
+    // =========================================================================
+    // 5. WEB TOOLS & CUSTOMIZER SUITE LOGIC
+    // =========================================================================
+
+    // Glassmorphism Generator
+    const blurInput = document.getElementById('blurInput');
+    const opacityInput = document.getElementById('opacityInput');
+    const radiusInput = document.getElementById('radiusInput');
+    const glassPreviewBox = document.getElementById('glass-preview-box');
+    const glassCssCode = document.getElementById('glassCssCode');
+
+    function updateGlassmorphism() {
+        if (!glassPreviewBox) return;
+        const blur = blurInput.value;
+        const opacity = opacityInput.value;
+        const radius = radiusInput.value;
+
+        document.getElementById('blurVal').textContent = `${blur}px`;
+        document.getElementById('opacityVal').textContent = opacity;
+        document.getElementById('radiusVal').textContent = `${radius}px`;
+
+        const css = `background: rgba(15, 23, 42, ${opacity}); backdrop-filter: blur(${blur}px); border-radius: ${radius}px;`;
+        glassPreviewBox.style.background = `rgba(15, 23, 42, ${opacity})`;
+        glassPreviewBox.style.backdropFilter = `blur(${blur}px)`;
+        glassPreviewBox.style.borderRadius = `${radius}px`;
+        glassCssCode.textContent = css;
+    }
+
+    [blurInput, opacityInput, radiusInput].forEach(inp => inp?.addEventListener('input', updateGlassmorphism));
+
+    // Shadow Generator
+    const shadowBlurInput = document.getElementById('shadowBlurInput');
+    const shadowSpreadInput = document.getElementById('shadowSpreadInput');
+    const shadowPreviewBox = document.getElementById('shadow-preview-box');
+    const shadowCssCode = document.getElementById('shadowCssCode');
+
+    function updateShadow() {
+        if (!shadowPreviewBox) return;
+        const blur = shadowBlurInput.value;
+        const spread = shadowSpreadInput.value;
+
+        document.getElementById('shadowBlurVal').textContent = `${blur}px`;
+        document.getElementById('shadowSpreadVal').textContent = `${spread}px`;
+
+        const css = `box-shadow: 0px 10px ${blur}px ${spread}px rgba(6, 182, 212, 0.4);`;
+        shadowPreviewBox.style.boxShadow = `0px 10px ${blur}px ${spread}px rgba(6, 182, 212, 0.4)`;
+        shadowCssCode.textContent = css;
+    }
+
+    [shadowBlurInput, shadowSpreadInput].forEach(inp => inp?.addEventListener('input', updateShadow));
+
+    // Gradient Mesh Generator
+    const gradColor1 = document.getElementById('gradColor1');
+    const gradColor2 = document.getElementById('gradColor2');
+    const gradAngleInput = document.getElementById('gradAngleInput');
+    const meshPreviewStage = document.getElementById('mesh-preview-stage');
+    const gradCssCode = document.getElementById('gradCssCode');
+
+    function updateGradient() {
+        if (!meshPreviewStage) return;
+        const c1 = gradColor1.value;
+        const c2 = gradColor2.value;
+        const angle = gradAngleInput.value;
+
+        document.getElementById('gradAngleVal').textContent = `${angle}deg`;
+
+        const css = `background: linear-gradient(${angle}deg, ${c1}, ${c2});`;
+        meshPreviewStage.style.background = `linear-gradient(${angle}deg, ${c1}, ${c2})`;
+        gradCssCode.textContent = css;
+    }
+
+    [gradColor1, gradColor2, gradAngleInput].forEach(inp => inp?.addEventListener('input', updateGradient));
+
+    // Quick SEO Audit Button
+    document.getElementById('runAuditBtn')?.addEventListener('click', () => {
+        showToast('Running Web Audit Analysis...', 'cyan');
+        setTimeout(() => {
+            showToast('Audit complete! Scores updated.', 'emerald');
+        }, 600);
+    });
+
+    // Copy Code Buttons
+    document.getElementById('copyGlassCodeBtn')?.addEventListener('click', () => {
+        copyToClipboard(glassCssCode.textContent);
+    });
+    document.getElementById('copyShadowCodeBtn')?.addEventListener('click', () => {
+        copyToClipboard(shadowCssCode.textContent);
+    });
+    document.getElementById('copyGradCodeBtn')?.addEventListener('click', () => {
+        copyToClipboard(gradCssCode.textContent);
+    });
+
+    // =========================================================================
+    // 6. EXPORT CODE & MODALS
+    // =========================================================================
+
+    const exportModal = document.getElementById('exportModal');
+    const closeExportModalBtn = document.getElementById('closeExportModalBtn');
+    const exportedCodeTextarea = document.getElementById('exportedCodeTextarea');
+    const copyExportedCodeBtn = document.getElementById('copyExportedCodeBtn');
+    const downloadCodeBtn = document.getElementById('downloadCodeBtn');
+
+    exportCodeBtn?.addEventListener('click', () => {
+        const blocks = builderCanvas.querySelectorAll('.canvas-block');
+        if (blocks.length === 0) {
+            showToast('Add at least one block to export code!', 'warning');
+            return;
+        }
+
+        let cleanHtml = `<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <title>Demoly Generated Site</title>\n    <link rel="stylesheet" href="style.css">\n</head>\n<body>\n`;
+
+        blocks.forEach(b => {
+            const clone = b.cloneNode(true);
+            const controls = clone.querySelector('.canvas-block-controls');
+            if (controls) controls.remove();
+            cleanHtml += `    ${clone.outerHTML.trim()}\n`;
+        });
+
+        cleanHtml += `</body>\n</html>`;
+
+        exportedCodeTextarea.value = cleanHtml;
+        exportModal.classList.add('active');
+    });
+
+    closeExportModalBtn?.addEventListener('click', () => {
+        exportModal.classList.remove('active');
+    });
+
+    copyExportedCodeBtn?.addEventListener('click', () => {
+        copyToClipboard(exportedCodeTextarea.value);
+    });
+
+    downloadCodeBtn?.addEventListener('click', () => {
+        const blob = new Blob([exportedCodeTextarea.value], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'demoly-site.html';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Downloaded demoly-site.html', 'cyan');
+    });
+
+    // Hire Modal
+    const hireModal = document.getElementById('hireModal');
+    const closeHireModalBtn = document.getElementById('closeHireModalBtn');
+    const hireModalSub = document.getElementById('hireModalSub');
+    const submitProposalBtn = document.getElementById('submitProposalBtn');
+
+    function openHireModal(name, role) {
+        if (hireModalSub) {
+            hireModalSub.textContent = `Send proposal to ${name} (${role})`;
+        }
+        hireModal.classList.add('active');
+    }
+
+    closeHireModalBtn?.addEventListener('click', () => {
+        hireModal.classList.remove('active');
+    });
+
+    submitProposalBtn?.addEventListener('click', () => {
+        hireModal.classList.remove('active');
+        showToast('Proposal submitted successfully! Freelancer notified.', 'emerald');
+    });
+
+    // Post Job Button
+    document.getElementById('postJobBtn')?.addEventListener('click', () => {
+        openHireModal('ZARO Community', 'Open Project Board');
+    });
+
+    // =========================================================================
+    // 7. UTILITY FUNCTIONS (TOAST & CLIPBOARD)
+    // =========================================================================
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Copied code to clipboard!', 'cyan');
+        }).catch(err => {
+            showToast('Failed to copy text', 'danger');
+        });
+    }
+
+    function showToast(msg, type = 'cyan') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
         const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-        
-        toast.innerHTML = `
-            <i class="fas ${icon}"></i>
-            <span>${message}</span>
-        `;
+        toast.className = 'toast';
+        toast.style.borderColor = type === 'emerald' ? 'var(--accent-emerald)' : 'var(--accent-cyan)';
+        toast.innerHTML = `<i class="fas fa-check-circle" style="color:${type === 'emerald' ? 'var(--accent-emerald)' : 'var(--accent-cyan)'}"></i> <span>${msg}</span>`;
 
         container.appendChild(toast);
 
         setTimeout(() => {
-            toast.classList.add('show');
-        }, 50);
-
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => {
-                toast.remove();
-            }, 400);
-        }, 4000);
+            toast.remove();
+        }, 3000);
     }
 
-    // --- Reveal Animations (initialized at the bottom to ensure DOM settlement) ---
-
-    // Google Apps Script Form Submission
-    const clientForm = document.getElementById('clientForm');
-    if (clientForm) {
-        const scriptURL = "https://script.google.com/macros/s/AKfycbyGvVU8pS-LsusSgqxWNXfcNsKEjxXEdCP5FIR5FvsfOCVgJ0fDq1WQuGp7QadGz8Jdqw/exec";
-        clientForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const btn = clientForm.querySelector('button');
-            const originalText = btn.innerHTML;
-
-            // UI Feedback: Loading state
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-            btn.disabled = true;
-
-            const data = {
-                name: clientForm.querySelector('[id="name"], [name="name"]').value,
-                email: document.getElementById("email").value,
-                phone: document.getElementById("phone").value,
-                project: document.getElementById("project").value,
-                message: document.getElementById("message").value
-            };
-
-            fetch(scriptURL, {
-                method: "POST",
-                body: JSON.stringify(data)
-            })
-                .then(response => response.text())
-                .then(result => {
-                    // UI Feedback: Success state
-                    btn.innerHTML = '<i class="fas fa-check"></i> Sent Successfully!';
-                    btn.style.background = '#10b981';
-                    showToast("Registration Successful! We will contact you soon.", "success");
-                    clientForm.reset();
-
-                    setTimeout(() => {
-                        btn.innerHTML = originalText;
-                        btn.style.background = '';
-                        btn.disabled = false;
-                    }, 3000);
-                })
-                .catch(error => {
-                    console.error('Error!', error.message);
-                    btn.innerHTML = 'Error. Try Again';
-                    btn.style.background = '#ef4444';
-                    showToast("Error. Please try again or email us directly.", "error");
-
-                    setTimeout(() => {
-                        btn.innerHTML = originalText;
-                        btn.style.background = '';
-                        btn.disabled = false;
-                    }, 3000);
-                });
-        });
-    }
-
-    // Smooth Scroll for Nav Links, Premium Button, and Hero Buttons
-    document.querySelectorAll('.nav-link, .btn-premium-blink, .hero-btns a').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
-
-            // Update active state
-            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-            this.classList.add('active');
-
-            window.scrollTo({
-                top: targetSection.offsetTop - 80,
-                behavior: 'smooth'
-            });
-        });
-    });
-
-    // Review Form Submission Logic & Firestore Integration
-    const reviewForm = document.getElementById('reviewForm');
-    const reviewsList = document.getElementById('reviewsList');
-
-    if (reviewForm && reviewsList) {
-        // Load reviews from Firestore
-        const loadReviews = async () => {
-            try {
-                const q = query(collection(db, "reviews"), orderBy("timestamp", "asc"));
-                const querySnapshot = await getDocs(q);
-                querySnapshot.forEach((doc) => {
-                    const review = doc.data();
-                    if (review.name && review.feedback) {
-                        const reviewEl = createReviewElement(review.name, review.rating || 5, review.feedback);
-                        reviewEl.classList.add('stagger-item', 'revealed');
-                        reviewsList.appendChild(reviewEl);
-                    }
-                });
-            } catch (err) {
-                console.error("Error loading reviews:", err);
-            }
-        };
-
-        loadReviews();
-
-        reviewForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const name = reviewForm.querySelector('#name').value.trim();
-            const ratingInput = reviewForm.querySelector('#rating').value;
-            const text = reviewForm.querySelector('#feedback').value.trim();
-
-            let rating = parseInt(ratingInput);
-            if (rating < 1) rating = 1;
-            if (rating > 5) rating = 5;
-
-            const submitBtn = reviewForm.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-
-            try {
-                // Save to Firestore
-                await addDoc(collection(db, "reviews"), {
-                    name,
-                    rating,
-                    feedback: text,
-                    timestamp: serverTimestamp()
-                });
-
-                // Add to UI with a gorgeous fade-in slide transition
-                const reviewEl = createReviewElement(name, rating, text);
-                reviewEl.classList.add('stagger-item');
-                reviewsList.appendChild(reviewEl);
-                
-                // Force reflow and add revealed class for smooth, premium transition
-                reviewEl.getBoundingClientRect();
-                reviewEl.classList.add('revealed');
-
-                // Reset form and show success toast
-                reviewForm.reset();
-                showToast("Thank you for your feedback!", "success");
-                
-                // Scroll to see the new review smoothly
-                reviewEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            } catch (err) {
-                console.error("Error adding review:", err);
-                showToast("Could not submit review. Please try again.", "error");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-            }
-        });
-
-        function createReviewElement(name, rating, text) {
-            const card = document.createElement('div');
-            card.className = 'review-card';
-            
-            let starsHtml = '';
-            for (let i = 0; i < 5; i++) {
-                if (i < rating) {
-                    starsHtml += '<i class="fas fa-star"></i>';
-                } else {
-                    starsHtml += '<i class="far fa-star"></i>'; // empty star
-                }
-            }
-
-            card.innerHTML = `
-                <div class="review-header">
-                    <h4>${name}</h4>
-                    <div class="review-rating">${starsHtml}</div>
-                </div>
-                <p>"${text}"</p>
-            `;
-            return card;
-        }
-    }
-
-    // Auth Modal Logic & Firebase Auth Integration
-    const loginBtn = document.getElementById('loginBtn');
-    const authModal = document.getElementById('authModal');
-    const closeAuthModal = document.getElementById('closeAuthModal');
-    const tabLogin = document.getElementById('tabLogin');
-    const tabSignup = document.getElementById('tabSignup');
-    const loginForm = document.getElementById('loginForm');
-    const signupForm = document.getElementById('signupForm');
-    const googleSignInBtn = document.getElementById('googleSignInBtn');
-    const userProfile = document.getElementById('userProfile');
-
-    // Monitor Firebase Auth State Changed
-    onAuthStateChanged(auth, (user) => {
-        const loginBtnEl = document.getElementById('loginBtn');
-        const userProfileEl = document.getElementById('userProfile');
-        const userNameDisplay = document.getElementById('userNameDisplay');
-        const profileImg = document.getElementById('profileImg');
-
-        if (user) {
-            const name = user.displayName || user.email.split('@')[0] || 'User';
-            if (loginBtnEl) loginBtnEl.style.display = 'none';
-            if (userProfileEl) {
-                userProfileEl.style.display = 'flex';
-                userNameDisplay.textContent = name;
-                profileImg.src = user.photoURL || `https://ui-avatars.com/api/?name=${name}&background=random&color=fff`;
-            }
-        } else {
-            if (loginBtnEl) loginBtnEl.style.display = 'inline-flex';
-            if (userProfileEl) userProfileEl.style.display = 'none';
-        }
-    });
-
-    // Sign out confirmation handler on profile click
-    if (userProfile) {
-        userProfile.addEventListener('click', async () => {
-            if (confirm("Do you want to sign out?")) {
-                try {
-                    await signOut(auth);
-                    showToast("Signed out successfully!", "success");
-                } catch (err) {
-                    showToast(err.message, "error");
-                }
-            }
-        });
-    }
-
-    if (loginBtn && authModal) {
-        loginBtn.addEventListener('click', () => {
-            authModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-
-        closeAuthModal.addEventListener('click', () => {
-            authModal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        });
-
-        authModal.addEventListener('click', (e) => {
-            if (e.target === authModal) {
-                authModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            }
-        });
-
-        tabLogin.addEventListener('click', () => {
-            tabLogin.classList.add('active');
-            tabSignup.classList.remove('active');
-            loginForm.classList.add('active');
-            signupForm.classList.remove('active');
-        });
-
-        tabSignup.addEventListener('click', () => {
-            tabSignup.classList.add('active');
-            tabLogin.classList.remove('active');
-            signupForm.classList.add('active');
-            loginForm.classList.remove('active');
-        });
-        
-        // Handle login form submission
-        if (loginForm) {
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const emailInput = loginForm.querySelector('input[type="email"]').value.trim();
-                const passwordInput = loginForm.querySelector('input[type="password"]').value;
-                
-                const submitBtn = loginForm.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
-
-                try {
-                    await signInWithEmailAndPassword(auth, emailInput, passwordInput);
-                    authModal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
-                    loginForm.reset();
-                    showToast("Signed in successfully!", "success");
-                } catch (err) {
-                    console.error("Login failure:", err);
-                    showToast(err.message, "error");
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                }
-            });
-        }
-        
-        // Handle signup form submission
-        if (signupForm) {
-            signupForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const nameInput = signupForm.querySelector('input[placeholder="Full Name"]').value.trim();
-                const emailInput = signupForm.querySelector('input[type="email"]').value.trim();
-                const passwordInput = signupForm.querySelector('input[type="password"]').value;
-
-                const submitBtn = signupForm.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
-
-                try {
-                    const userCredential = await createUserWithEmailAndPassword(auth, emailInput, passwordInput);
-                    await updateProfile(userCredential.user, {
-                        displayName: nameInput
-                    });
-                    authModal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
-                    signupForm.reset();
-                    showToast(`Account created successfully! Welcome, ${nameInput}.`, "success");
-                } catch (err) {
-                    console.error("Signup failure:", err);
-                    showToast(err.message, "error");
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                }
-            });
-        }
-
-        // Handle Google Sign-In
-        if (googleSignInBtn) {
-            googleSignInBtn.addEventListener('click', async () => {
-                const originalText = googleSignInBtn.innerHTML;
-                googleSignInBtn.disabled = true;
-                googleSignInBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
-
-                try {
-                    const result = await signInWithPopup(auth, googleProvider);
-                    const user = result.user;
-                    authModal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
-                    showToast(`Welcome, ${user.displayName || 'User'}!`, "success");
-                } catch (err) {
-                    console.error("Google login failure:", err);
-                    showToast(err.message, "error");
-                } finally {
-                    googleSignInBtn.disabled = false;
-                    googleSignInBtn.innerHTML = originalText;
-                }
-            });
-        }
-    }
-
-    // --- Premium Dynamic Scroll Reveal System ---
-    // Inject reveal styles dynamically
-    const style = document.createElement('style');
-    style.innerHTML = `
-        /* Dynamic scroll reveal animations */
-        .reveal-element {
-            opacity: 0;
-            transform: translateY(35px);
-            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .reveal-element.revealed {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
-        }
-        .stagger-item {
-            opacity: 0;
-            transform: translateY(35px);
-            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .stagger-item.revealed {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
-        }
-        
-        /* Hero entry page load animations */
-        .hero-title, .hero-subtitle, .hero-btns {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .hero-title.loaded, .hero-subtitle.loaded, .hero-btns.loaded {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
-        }
-    `;
-    document.head.appendChild(style);
-
-    // Staggered containers and their children initialization
-    const staggerConfigs = [
-        { container: '.services-grid', children: '.service-card' },
-        { container: '.process-list', children: '.process-step' },
-        { container: '.work-grid', children: '.work-item' },
-        { container: '.reviews-list', children: '.review-card' }
-    ];
-
-    staggerConfigs.forEach(config => {
-        const container = document.querySelector(config.container);
-        if (container) {
-            container.classList.add('stagger-container');
-            const items = container.querySelectorAll(config.children);
-            items.forEach(item => {
-                item.classList.add('stagger-item');
-            });
-        }
-    });
-
-    // Individual elements reveal initialization
-    const individualSelectors = [
-        '.section-header',
-        '.contact-content',
-        '.contact-form',
-        '.review-form-wrapper'
-    ];
-
-    individualSelectors.forEach(selector => {
-        const elements = document.querySelectorAll(selector);
-        elements.forEach(el => {
-            el.classList.add('reveal-element');
-        });
-    });
-
-    // Intersection Observer for Reveal Animations
-    const observerOptions = {
-        threshold: 0.05,
-        rootMargin: '0px 0px -50px 0px' // Triggers slightly before element is fully in frame
-    };
-
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const target = entry.target;
-                
-                if (target.classList.contains('stagger-container')) {
-                    const items = target.querySelectorAll('.stagger-item:not(.revealed)');
-                    items.forEach((item, index) => {
-                        setTimeout(() => {
-                            item.classList.add('revealed');
-                        }, index * 120); // 120ms staggered delay between items
-                    });
-                    revealObserver.unobserve(target);
-                } else if (target.classList.contains('reveal-element')) {
-                    target.classList.add('revealed');
-                    revealObserver.unobserve(target);
-                }
-            }
-        });
-    }, observerOptions);
-
-    // Register all reveal triggers
-    document.querySelectorAll('.stagger-container, .reveal-element').forEach(el => {
-        revealObserver.observe(el);
-    });
-
-    // Hero entry page-load animations triggered sequentially
-    const heroTitle = document.querySelector('.hero-title');
-    const heroSubtitle = document.querySelector('.hero-subtitle');
-    const heroBtns = document.querySelector('.hero-btns');
-
-    if (heroTitle && heroSubtitle && heroBtns) {
-        setTimeout(() => {
-            heroTitle.classList.add('loaded');
-        }, 150);
-        setTimeout(() => {
-            heroSubtitle.classList.add('loaded');
-        }, 350);
-        setTimeout(() => {
-            heroBtns.classList.add('loaded');
-        }, 550);
-    }
 });
