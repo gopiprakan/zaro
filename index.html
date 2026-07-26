@@ -549,16 +549,87 @@
 
             <div class="tool-control-group">
                 <label>Project Scope</label>
-                <textarea rows="4" style="width: 100%; background: var(--apple-bg); border: 1px solid var(--apple-border-subtle); padding: 0.65rem; border-radius: var(--radius-sm); color: #fff;" placeholder="Describe project details or Demoly requirements..."></textarea>
+                <textarea id="proposalScopeText" rows="4" style="width: 100%; background: var(--apple-bg); border: 1px solid var(--apple-border-subtle); padding: 0.65rem; border-radius: var(--radius-sm); color: #fff;" placeholder="Describe project details or Demoly requirements..."></textarea>
             </div>
 
             <div class="tool-control-group">
                 <label>Budget ($ USD)</label>
-                <input type="number" value="1500" style="width: 100%; background: var(--apple-bg); border: 1px solid var(--apple-border-subtle); padding: 0.5rem; border-radius: var(--radius-sm); color: #fff;">
+                <input type="number" id="proposalBudgetInput" value="1500" style="width: 100%; background: var(--apple-bg); border: 1px solid var(--apple-border-subtle); padding: 0.5rem; border-radius: var(--radius-sm); color: #fff;">
             </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
                 <button class="btn btn-blue btn-sm" id="submitProposalBtn">Submit Proposal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: Post Project Modal -->
+    <div class="modal-overlay" id="postProjectModal">
+        <div class="modal-box">
+            <button class="modal-close" id="closePostProjectModalBtn">&times;</button>
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.35rem;"><i class="fas fa-plus-circle"></i> Post New Project</h3>
+            <p style="font-size: 0.825rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                Post your Web engineering or Demoly Studio project requirement to the ZARO community.
+            </p>
+
+            <div class="tool-control-group">
+                <label>Project Title</label>
+                <input type="text" id="postTitleInput" placeholder="e.g. Build Custom SaaS Landing Page in Demoly" style="width: 100%; background: var(--apple-bg); border: 1px solid var(--apple-border-subtle); padding: 0.55rem; border-radius: var(--radius-sm); color: #fff;">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                <div class="tool-control-group">
+                    <label>Category</label>
+                    <select id="postCategorySelect" style="width: 100%; background: var(--apple-bg); border: 1px solid var(--apple-border-subtle); padding: 0.5rem; border-radius: var(--radius-sm); color: #fff; font-size: 0.825rem;">
+                        <option value="fullstack">Full Stack Engineering</option>
+                        <option value="design">UI/UX & Minimalist Design</option>
+                        <option value="demoly">Demoly Architect</option>
+                        <option value="webtools">Webtools Integration</option>
+                    </select>
+                </div>
+                <div class="tool-control-group">
+                    <label>Budget ($ USD)</label>
+                    <input type="number" id="postBudgetInput" value="2500" style="width: 100%; background: var(--apple-bg); border: 1px solid var(--apple-border-subtle); padding: 0.5rem; border-radius: var(--radius-sm); color: #fff;">
+                </div>
+            </div>
+
+            <div class="tool-control-group">
+                <label>Required Skills (comma separated)</label>
+                <input type="text" id="postSkillsInput" value="Demoly Studio, React, CSS3, Performance" style="width: 100%; background: var(--apple-bg); border: 1px solid var(--apple-border-subtle); padding: 0.55rem; border-radius: var(--radius-sm); color: #fff;">
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
+                <button class="btn btn-blue btn-sm" id="submitPostProjectBtn">Publish Project</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 4: Live Canvas Block Inline Editor Modal -->
+    <div class="modal-overlay" id="editBlockModal">
+        <div class="modal-box">
+            <button class="modal-close" id="closeEditBlockModalBtn">&times;</button>
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.35rem;"><i class="fas fa-edit"></i> Edit Block Content</h3>
+            <p style="font-size: 0.825rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                Customize text, headlines, and button labels for this block.
+            </p>
+
+            <div class="tool-control-group">
+                <label>Headline Title</label>
+                <input type="text" id="editBlockTitleInput" style="width: 100%; background: var(--apple-bg); border: 1px solid var(--apple-border-subtle); padding: 0.55rem; border-radius: var(--radius-sm); color: #fff;">
+            </div>
+
+            <div class="tool-control-group">
+                <label>Subtitle / Description</label>
+                <textarea id="editBlockDescInput" rows="3" style="width: 100%; background: var(--apple-bg); border: 1px solid var(--apple-border-subtle); padding: 0.55rem; border-radius: var(--radius-sm); color: #fff;"></textarea>
+            </div>
+
+            <div class="tool-control-group">
+                <label>Primary Button Label</label>
+                <input type="text" id="editBlockBtnInput" style="width: 100%; background: var(--apple-bg); border: 1px solid var(--apple-border-subtle); padding: 0.55rem; border-radius: var(--radius-sm); color: #fff;">
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
+                <button class="btn btn-blue btn-sm" id="saveBlockEditBtn">Apply Changes</button>
             </div>
         </div>
     </div>

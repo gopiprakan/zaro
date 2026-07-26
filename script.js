@@ -60,9 +60,28 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     const BLOCK_TEMPLATES = {
+        navbar: `
+        <div class="canvas-block demo-navbar-block" data-type="navbar">
+            <div class="canvas-block-controls">
+                <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+                <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+                <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
+            </div>
+            <div style="font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-layer-group" style="color:var(--apple-blue);"></i> ZARO App</div>
+            <div style="display: flex; gap: 1.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+                <span>Features</span>
+                <span>Solutions</span>
+                <span>Pricing</span>
+                <span>Docs</span>
+            </div>
+            <button class="btn btn-blue btn-sm">Launch App</button>
+        </div>`,
+
         hero: `
         <div class="canvas-block demo-hero-block" data-type="hero">
             <div class="canvas-block-controls">
+                <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
                 <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
                 <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
                 <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
@@ -79,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         features: `
         <div class="canvas-block demo-features-block" data-type="features">
             <div class="canvas-block-controls">
+                <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
                 <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
                 <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
                 <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
@@ -95,14 +115,67 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="demo-feature-card">
                 <i class="fas fa-shield-alt" style="font-size: 1.5rem; color: var(--apple-green); margin-bottom: 0.75rem;"></i>
-                <h3 style="font-size: 1.05rem; font-weight: 600;">Apple Security</h3>
+                <h3 style="font-size: 1.05rem; font-weight: 600;">Monochrome Shield</h3>
                 <p style="font-size: 0.825rem; color: var(--text-secondary); margin-top: 0.35rem;">Clean semantic markup ready to deploy anywhere.</p>
+            </div>
+        </div>`,
+
+        testimonials: `
+        <div class="canvas-block demo-testimonials-block" data-type="testimonials">
+            <div class="canvas-block-controls">
+                <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+                <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+                <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
+            </div>
+            <div style="text-align: center; max-width: 600px; margin: 0 auto 2rem;">
+                <h2 style="font-size: 2rem; font-weight: 700;">Loved by Innovators Worldwide</h2>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.35rem;">See what engineers say about building with ZARO and Demoly Studio.</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div style="color: var(--apple-orange); font-size: 0.8rem; margin-bottom: 0.5rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p style="font-size: 0.85rem; color: var(--text-primary); line-height: 1.5;">"Demoly Studio allowed our design team to prototype and deploy clean UI blocks in minutes instead of days."</p>
+                    <div style="font-size: 0.8rem; font-weight: 600; margin-top: 0.85rem;">David K. — CTO at Apex AI</div>
+                </div>
+                <div class="testimonial-card">
+                    <div style="color: var(--apple-orange); font-size: 0.8rem; margin-bottom: 0.5rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p style="font-size: 0.85rem; color: var(--text-primary); line-height: 1.5;">"The Webtools suite and instant code generator have become an essential part of my daily engineering workflow."</p>
+                    <div style="font-size: 0.8rem; font-weight: 600; margin-top: 0.85rem;">Sarah L. — Staff Engineer</div>
+                </div>
+            </div>
+        </div>`,
+
+        stats: `
+        <div class="canvas-block demo-stats-block" data-type="stats">
+            <div class="canvas-block-controls">
+                <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+                <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+                <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
+            </div>
+            <div class="stat-card">
+                <h2>$12M+</h2>
+                <p>Volume Built</p>
+            </div>
+            <div class="stat-card">
+                <h2>99.9%</h2>
+                <p>Uptime Score</p>
+            </div>
+            <div class="stat-card">
+                <h2>45k+</h2>
+                <p>Active Users</p>
+            </div>
+            <div class="stat-card">
+                <h2>0.1ms</h2>
+                <p>Render Latency</p>
             </div>
         </div>`,
 
         pricing: `
         <div class="canvas-block demo-pricing-block" data-type="pricing">
             <div class="canvas-block-controls">
+                <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
                 <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
                 <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
                 <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
@@ -122,9 +195,45 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         </div>`,
 
+        cta: `
+        <div class="canvas-block demo-cta-block" data-type="cta">
+            <div class="canvas-block-controls">
+                <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+                <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+                <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
+            </div>
+            <h2 style="font-size: 2.25rem; font-weight: 700; margin-bottom: 0.5rem;">Start Building with ZARO Demoly</h2>
+            <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 1.5rem; font-size: 0.95rem;">Join thousands of web architects crafting minimal, high-frequency websites.</p>
+            <div style="display: flex; gap: 0.5rem; max-width: 420px; margin: 0 auto;">
+                <input type="email" placeholder="Enter work email..." style="flex: 1; background: var(--apple-bg); border: 1px solid var(--apple-border); padding: 0.6rem 1rem; border-radius: var(--radius-full); color: #fff; font-size: 0.85rem;">
+                <button class="btn btn-blue btn-sm">Get Started</button>
+            </div>
+        </div>`,
+
+        faq: `
+        <div class="canvas-block demo-faq-block" data-type="faq">
+            <div class="canvas-block-controls">
+                <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+                <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+                <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
+            </div>
+            <h2 style="font-size: 1.75rem; text-align: center; margin-bottom: 1.5rem;">Frequently Asked Questions</h2>
+            <div class="faq-item active">
+                <div class="faq-question"><span>What is ZARO Demoly Studio?</span> <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">Demoly Studio is a browser-based visual website builder with instant clean HTML/CSS code export capabilities.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question"><span>Can I export clean code for production?</span> <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">Yes, 100% clean, semantic markup ready to deploy to Vercel, Netlify, or any static host.</div>
+            </div>
+        </div>`,
+
         footer: `
         <div class="canvas-block" data-type="footer" style="padding: 2.5rem 2rem; background: var(--apple-surface); border-top: 1px solid var(--apple-border-subtle);">
             <div class="canvas-block-controls">
+                <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
                 <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
                 <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
                 <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
