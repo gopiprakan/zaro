@@ -456,6 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const deleteBtn = blockEl.querySelector('.delete-block-btn');
         const moveUpBtn = blockEl.querySelector('.move-up-btn');
         const moveDownBtn = blockEl.querySelector('.move-down-btn');
+        const editBtn = blockEl.querySelector('.edit-block-btn');
 
         deleteBtn?.addEventListener('click', () => {
             blockEl.remove();
@@ -476,7 +477,80 @@ document.addEventListener('DOMContentLoaded', () => {
                 builderCanvas.insertBefore(blockEl.nextElementSibling, blockEl);
             }
         });
+
+        editBtn?.addEventListener('click', () => {
+            openBlockEditorModal(blockEl);
+        });
+
+        // FAQ accordion item toggle
+        blockEl.querySelectorAll('.faq-item').forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('active');
+            });
+        });
     }
+
+    // Inline Block Editor Modal Logic
+    const editBlockModal = document.getElementById('editBlockModal');
+    const closeEditBlockModalBtn = document.getElementById('closeEditBlockModalBtn');
+    const editBlockTitleInput = document.getElementById('editBlockTitleInput');
+    const editBlockDescInput = document.getElementById('editBlockDescInput');
+    const editBlockBtnInput = document.getElementById('editBlockBtnInput');
+    const saveBlockEditBtn = document.getElementById('saveBlockEditBtn');
+    let currentEditingBlock = null;
+
+    function openBlockEditorModal(blockEl) {
+        currentEditingBlock = blockEl;
+        const titleEl = blockEl.querySelector('h1, h2, h3, h4');
+        const descEl = blockEl.querySelector('p');
+        const btnEl = blockEl.querySelector('.btn-blue, .btn-primary, button');
+
+        if (editBlockTitleInput) editBlockTitleInput.value = titleEl ? titleEl.innerText : '';
+        if (editBlockDescInput) editBlockDescInput.value = descEl ? descEl.innerText : '';
+        if (editBlockBtnInput) editBlockBtnInput.value = btnEl ? btnEl.innerText : '';
+
+        editBlockModal.classList.add('active');
+    }
+
+    closeEditBlockModalBtn?.addEventListener('click', () => {
+        editBlockModal.classList.remove('active');
+    });
+
+    saveBlockEditBtn?.addEventListener('click', () => {
+        if (!currentEditingBlock) return;
+
+        const titleEl = currentEditingBlock.querySelector('h1, h2, h3, h4');
+        const descEl = currentEditingBlock.querySelector('p');
+        const btnEl = currentEditingBlock.querySelector('.btn-blue, .btn-primary, button');
+
+        if (titleEl && editBlockTitleInput.value.trim() !== '') {
+            titleEl.innerText = editBlockTitleInput.value.trim();
+        }
+        if (descEl && editBlockDescInput.value.trim() !== '') {
+            descEl.innerText = editBlockDescInput.value.trim();
+        }
+        if (btnEl && editBlockBtnInput.value.trim() !== '') {
+            btnEl.innerText = editBlockBtnInput.value.trim();
+        }
+
+        editBlockModal.classList.remove('active');
+        showToast('Block content updated live on canvas!', 'blue');
+    });
+
+    // Preset Page Layout Loaders
+    document.getElementById('loadSaasPresetBtn')?.addEventListener('click', () => {
+        const blocks = builderCanvas.querySelectorAll('.canvas-block');
+        blocks.forEach(b => b.remove());
+        ['navbar', 'hero', 'features', 'testimonials', 'cta', 'footer'].forEach(type => addBlockToCanvas(type));
+        showToast('Loaded SaaS Landing Page Preset!', 'blue');
+    });
+
+    document.getElementById('loadPortfolioPresetBtn')?.addEventListener('click', () => {
+        const blocks = builderCanvas.querySelectorAll('.canvas-block');
+        blocks.forEach(b => b.remove());
+        ['navbar', 'hero', 'stats', 'testimonials', 'footer'].forEach(type => addBlockToCanvas(type));
+        showToast('Loaded Portfolio Studio Preset!', 'blue');
+    });
 
     clearCanvasBtn?.addEventListener('click', () => {
         const blocks = builderCanvas.querySelectorAll('.canvas-block');
@@ -579,6 +653,81 @@ document.addEventListener('DOMContentLoaded', () => {
 
     [gradColor1, gradColor2, gradAngleInput].forEach(inp => inp?.addEventListener('input', updateGradient));
 
+    // Tool 5: Titanium Color Palette Studio
+    const randomizePaletteBtn = document.getElementById('randomizePaletteBtn');
+    const paletteGrid = document.getElementById('paletteGrid');
+    const paletteCssCode = document.getElementById('paletteCssCode');
+    const copyPaletteCodeBtn = document.getElementById('copyPaletteCodeBtn');
+
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function generateRandomPalette() {
+        if (!paletteGrid) return;
+        const colors = [
+            '#000000',
+            '#161617',
+            getRandomColor(),
+            getRandomColor(),
+            getRandomColor()
+        ];
+
+        const chips = paletteGrid.querySelectorAll('.palette-chip');
+        chips.forEach((chip, idx) => {
+            const hex = colors[idx];
+            chip.style.background = hex;
+            chip.setAttribute('data-color', hex);
+            chip.textContent = hex;
+        });
+
+        const css = `--bg: ${colors[0]}; --surface: ${colors[1]}; --accent-1: ${colors[2]}; --accent-2: ${colors[3]}; --accent-3: ${colors[4]};`;
+        if (paletteCssCode) paletteCssCode.textContent = css;
+    }
+
+    randomizePaletteBtn?.addEventListener('click', generateRandomPalette);
+
+    paletteGrid?.querySelectorAll('.palette-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const color = chip.getAttribute('data-color');
+            copyToClipboard(color);
+        });
+    });
+
+    copyPaletteCodeBtn?.addEventListener('click', () => {
+        if (paletteCssCode) copyToClipboard(paletteCssCode.textContent);
+    });
+
+    // Tool 6: Flexbox & Alignment Studio
+    const flexDirSelect = document.getElementById('flexDirSelect');
+    const flexJustifySelect = document.getElementById('flexJustifySelect');
+    const flexStage = document.getElementById('flexStage');
+    const flexCssCode = document.getElementById('flexCssCode');
+    const copyFlexCodeBtn = document.getElementById('copyFlexCodeBtn');
+
+    function updateFlexStage() {
+        if (!flexStage) return;
+        const dir = flexDirSelect.value;
+        const justify = flexJustifySelect.value;
+
+        flexStage.style.flexDirection = dir;
+        flexStage.style.justifyContent = justify;
+
+        const css = `display: flex; flex-direction: ${dir}; justify-content: ${justify}; align-items: center; gap: 0.5rem;`;
+        if (flexCssCode) flexCssCode.textContent = css;
+    }
+
+    flexDirSelect?.addEventListener('change', updateFlexStage);
+    flexJustifySelect?.addEventListener('change', updateFlexStage);
+    copyFlexCodeBtn?.addEventListener('click', () => {
+        if (flexCssCode) copyToClipboard(flexCssCode.textContent);
+    });
+
     // Audit Calculator
     document.getElementById('runAuditBtn')?.addEventListener('click', () => {
         showToast('Running Web Audit Inspector...', 'blue');
@@ -649,7 +798,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('Downloaded demoly-site.html', 'blue');
     });
 
-    // Hire Modal
+    // Proposal / Hire Modal
     const hireModal = document.getElementById('hireModal');
     const closeHireModalBtn = document.getElementById('closeHireModalBtn');
     const hireModalSub = document.getElementById('hireModalSub');
@@ -671,8 +820,44 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('Proposal submitted! Specialist notified.', 'blue');
     });
 
-    document.getElementById('postJobBtn')?.addEventListener('click', () => {
-        openHireModal('ZARO Community', 'Open Project Board');
+    // Post Project Modal Logic
+    const postProjectModal = document.getElementById('postProjectModal');
+    const closePostProjectModalBtn = document.getElementById('closePostProjectModalBtn');
+    const submitPostProjectBtn = document.getElementById('submitPostProjectBtn');
+    const postJobBtn = document.getElementById('postJobBtn');
+
+    postJobBtn?.addEventListener('click', () => {
+        postProjectModal?.classList.add('active');
+    });
+
+    closePostProjectModalBtn?.addEventListener('click', () => {
+        postProjectModal?.classList.remove('active');
+    });
+
+    submitPostProjectBtn?.addEventListener('click', () => {
+        const title = document.getElementById('postTitleInput')?.value || 'New Project Requirement';
+        const category = document.getElementById('postCategorySelect')?.value || 'fullstack';
+        const budget = document.getElementById('postBudgetInput')?.value || 2500;
+        const skillsText = document.getElementById('postSkillsInput')?.value || 'Demoly, CSS3';
+
+        const newListing = {
+            id: Date.now(),
+            name: title,
+            role: `Open Project ($${budget} Budget)`,
+            rating: 5.0,
+            reviews: 1,
+            rate: Math.round(budget / 20),
+            category: category,
+            avatar: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=300&q=80",
+            tags: skillsText.split(',').map(s => s.trim()),
+            verified: true
+        };
+
+        FREELANCERS_DATA.unshift(newListing);
+        updateMarketplaceGrid();
+
+        postProjectModal?.classList.remove('active');
+        showToast('Project published to Marketplace stream!', 'blue');
     });
 
     // =========================================================================
