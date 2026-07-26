@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                <div style="font-weight: 600; font-size: 1.05rem;"><i class="fab fa-apple"></i> ZARO Demoly Studio</div>
+                <div style="font-weight: 600; font-size: 1.05rem;"><i class="fas fa-layer-group"></i> ZARO Demoly Studio</div>
                 <div style="font-size: 0.8rem; color: var(--text-secondary);">Copyright © 2026 ZARO Inc. All rights reserved.</div>
             </div>
         </div>`
