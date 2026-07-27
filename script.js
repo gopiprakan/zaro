@@ -1,5 +1,5 @@
 /**
- * ZARO PLATFORM & DEMOLY WEB STUDIO - APPLE-INSPIRED ENGINE
+ * ZARO PLATFORM & DEMOLY WEB STUDIO - CYBER-LUXE ENGINE
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,18 +8,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. DATA & STATE MANAGEMENT
     // =========================================================================
 
+    let savedFavorites = JSON.parse(localStorage.getItem('zaro_favorites') || '[]');
+    let canvasHistory = [];
+    let historyStep = -1;
+
     const FREELANCERS_DATA = [
         {
             id: 1,
             name: "Alex Rivera",
             role: "Senior Full Stack & Demoly Engineer",
-            rating: 4.9,
+            rating: 4.95,
             reviews: 48,
             rate: 85,
             category: "fullstack",
             avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
             tags: ["Demoly Studio", "React", "Node.js", "TailwindCSS"],
-            verified: true
+            verified: true,
+            bio: "Specializing in high-frequency web engineering and visual web builder design with over 8 years of production experience."
         },
         {
             id: 2,
@@ -31,31 +36,34 @@ document.addEventListener('DOMContentLoaded', () => {
             category: "design",
             avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80",
             tags: ["Figma", "Webtools", "Apple Design", "CSS3"],
-            verified: true
+            verified: true,
+            bio: "Crafting modern glassmorphic interface systems and minimalist product experiences for top tech brands globally."
         },
         {
             id: 3,
             name: "Marcus Vance",
             role: "Demoly Architect Specialist",
-            rating: 4.8,
+            rating: 4.88,
             reviews: 31,
             rate: 70,
             category: "demoly",
             avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80",
             tags: ["Demoly Blocks", "HTML5", "JavaScript", "Performance"],
-            verified: true
+            verified: true,
+            bio: "Expert at transforming design specs into clean, modular Demoly Studio components with 100/100 Lighthouse scores."
         },
         {
             id: 4,
             name: "Sophia Chen",
             role: "Webtools Integration Engineer",
-            rating: 4.9,
+            rating: 4.92,
             reviews: 55,
             rate: 110,
             category: "webtools",
             avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80",
             tags: ["CSS Generators", "WebGL", "Canvas API", "UI Testing"],
-            verified: true
+            verified: true,
+            bio: "Front-end performance engineer specializing in WebGL shaders, CSS layout engines, and custom generator tools."
         }
     ];
 
@@ -64,12 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="canvas-block demo-navbar-block" data-type="navbar">
             <div class="canvas-block-controls">
                 <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn dup-block-btn" title="Duplicate Block"><i class="fas fa-copy"></i></button>
                 <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
                 <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
                 <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
             </div>
-            <div style="font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-layer-group" style="color:var(--apple-blue);"></i> ZARO App</div>
-            <div style="display: flex; gap: 1.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+            <div style="font-weight: 700; font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-cubes" style="color:var(--accent-cyan);"></i> ZARO App</div>
+            <div style="display: flex; gap: 1.75rem; font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">
                 <span>Features</span>
                 <span>Solutions</span>
                 <span>Pricing</span>
@@ -82,13 +91,14 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="canvas-block demo-hero-block" data-type="hero">
             <div class="canvas-block-controls">
                 <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn dup-block-btn" title="Duplicate Block"><i class="fas fa-copy"></i></button>
                 <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
                 <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
                 <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
             </div>
-            <span style="font-size: 0.8rem; font-weight: 600; color: var(--apple-blue); letter-spacing: 0.05em; display: inline-block; margin-bottom: 0.5rem;">NEXT-GEN ENGINEERING</span>
-            <h1 class="demo-hero-title">Designed to Perform.<br>Crafted for You.</h1>
-            <p style="color: var(--text-secondary); max-width: 550px; margin: 0 auto 1.75rem; font-size: 1.05rem;">Customized live with Demoly Studio and built for speed, elegance, and precision.</p>
+            <span style="font-size: 0.775rem; font-weight: 700; color: var(--accent-cyan); letter-spacing: 0.08em; display: inline-block; margin-bottom: 0.6rem; text-transform: uppercase;">NEXT-GEN ENGINEERING</span>
+            <h1 class="demo-hero-title">Designed to Perform.<br>Crafted for Speed.</h1>
+            <p style="color: var(--text-secondary); max-width: 580px; margin: 0 auto 1.85rem; font-size: 1.1rem; line-height: 1.5;">Customized live with Demoly Studio and built for high-frequency web apps.</p>
             <div style="display: flex; gap: 0.75rem; justify-content: center;">
                 <button class="btn btn-blue">Get Started</button>
                 <button class="btn btn-secondary">Learn More</button>
@@ -99,24 +109,43 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="canvas-block demo-features-block" data-type="features">
             <div class="canvas-block-controls">
                 <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn dup-block-btn" title="Duplicate Block"><i class="fas fa-copy"></i></button>
                 <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
                 <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
                 <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
             </div>
             <div class="demo-feature-card">
-                <i class="fas fa-bolt" style="font-size: 1.5rem; color: var(--apple-blue); margin-bottom: 0.75rem;"></i>
-                <h3 style="font-size: 1.05rem; font-weight: 600;">Pro Performance</h3>
-                <p style="font-size: 0.825rem; color: var(--text-secondary); margin-top: 0.35rem;">Minimal CSS footprint and instantaneous load times.</p>
+                <i class="fas fa-bolt" style="font-size: 1.6rem; color: var(--accent-cyan); margin-bottom: 0.85rem;"></i>
+                <h3 style="font-size: 1.1rem; font-weight: 700;">Pro Performance</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.35rem;">Zero runtime overhead with ultra-fast page speed scores.</p>
             </div>
             <div class="demo-feature-card">
-                <i class="fas fa-magic" style="font-size: 1.5rem; color: var(--apple-purple); margin-bottom: 0.75rem;"></i>
-                <h3 style="font-size: 1.05rem; font-weight: 600;">Demoly Customizer</h3>
-                <p style="font-size: 0.825rem; color: var(--text-secondary); margin-top: 0.35rem;">Live layout editing directly inside your web browser.</p>
+                <i class="fas fa-magic" style="font-size: 1.6rem; color: var(--accent-purple); margin-bottom: 0.85rem;"></i>
+                <h3 style="font-size: 1.1rem; font-weight: 700;">Demoly Customizer</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.35rem;">Live layout tweaking directly inside your web browser.</p>
             </div>
             <div class="demo-feature-card">
-                <i class="fas fa-shield-alt" style="font-size: 1.5rem; color: var(--apple-green); margin-bottom: 0.75rem;"></i>
-                <h3 style="font-size: 1.05rem; font-weight: 600;">Monochrome Shield</h3>
-                <p style="font-size: 0.825rem; color: var(--text-secondary); margin-top: 0.35rem;">Clean semantic markup ready to deploy anywhere.</p>
+                <i class="fas fa-shield-alt" style="font-size: 1.6rem; color: var(--accent-emerald); margin-bottom: 0.85rem;"></i>
+                <h3 style="font-size: 1.1rem; font-weight: 700;">Titanium Shield</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.35rem;">Semantic standard HTML markup ready to deploy anywhere.</p>
+            </div>
+        </div>`,
+
+        techstack: `
+        <div class="canvas-block" data-type="techstack" style="padding: 4rem 2rem; text-align: center; background: rgba(255,255,255,0.015);">
+            <div class="canvas-block-controls">
+                <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn dup-block-btn" title="Duplicate Block"><i class="fas fa-copy"></i></button>
+                <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+                <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+                <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--text-secondary);">POWERED BY MODERN WEB STANDARDS</h3>
+            <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem;">
+                <span class="skill-tag" style="font-size: 0.9rem; padding: 0.4rem 1rem;"><i class="fab fa-html5" style="color: #e34f26;"></i> HTML5 Semantic</span>
+                <span class="skill-tag" style="font-size: 0.9rem; padding: 0.4rem 1rem;"><i class="fab fa-css3-alt" style="color: var(--accent-cyan);"></i> CSS Glassmorphism</span>
+                <span class="skill-tag" style="font-size: 0.9rem; padding: 0.4rem 1rem;"><i class="fab fa-js" style="color: var(--accent-amber);"></i> Vanilla JS ES6+</span>
+                <span class="skill-tag" style="font-size: 0.9rem; padding: 0.4rem 1rem;"><i class="fab fa-react" style="color: #61dafb;"></i> React Ready</span>
             </div>
         </div>`,
 
@@ -124,24 +153,25 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="canvas-block demo-testimonials-block" data-type="testimonials">
             <div class="canvas-block-controls">
                 <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn dup-block-btn" title="Duplicate Block"><i class="fas fa-copy"></i></button>
                 <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
                 <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
                 <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
             </div>
             <div style="text-align: center; max-width: 600px; margin: 0 auto 2rem;">
-                <h2 style="font-size: 2rem; font-weight: 700;">Loved by Innovators Worldwide</h2>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.35rem;">See what engineers say about building with ZARO and Demoly Studio.</p>
+                <h2 style="font-size: 2.25rem; font-weight: 800;">Loved by Engineering Teams</h2>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.35rem;">See what engineers say about building with ZARO and Demoly Studio.</p>
             </div>
             <div class="testimonials-grid">
                 <div class="testimonial-card">
-                    <div style="color: var(--apple-orange); font-size: 0.8rem; margin-bottom: 0.5rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <p style="font-size: 0.85rem; color: var(--text-primary); line-height: 1.5;">"Demoly Studio allowed our design team to prototype and deploy clean UI blocks in minutes instead of days."</p>
-                    <div style="font-size: 0.8rem; font-weight: 600; margin-top: 0.85rem;">David K. — CTO at Apex AI</div>
+                    <div style="color: var(--accent-amber); font-size: 0.85rem; margin-bottom: 0.6rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p style="font-size: 0.875rem; color: var(--text-primary); line-height: 1.55;">"Demoly Studio allowed our team to prototype and export production HTML/CSS components in under an hour."</p>
+                    <div style="font-size: 0.825rem; font-weight: 700; margin-top: 0.9rem;">David K. — CTO at Apex AI</div>
                 </div>
                 <div class="testimonial-card">
-                    <div style="color: var(--apple-orange); font-size: 0.8rem; margin-bottom: 0.5rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <p style="font-size: 0.85rem; color: var(--text-primary); line-height: 1.5;">"The Webtools suite and instant code generator have become an essential part of my daily engineering workflow."</p>
-                    <div style="font-size: 0.8rem; font-weight: 600; margin-top: 0.85rem;">Sarah L. — Staff Engineer</div>
+                    <div style="color: var(--accent-amber); font-size: 0.85rem; margin-bottom: 0.6rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p style="font-size: 0.875rem; color: var(--text-primary); line-height: 1.55;">"The Webtools suite and instant CSS generators have become an essential part of my daily engineering workflow."</p>
+                    <div style="font-size: 0.825rem; font-weight: 700; margin-top: 0.9rem;">Sarah L. — Staff Architect</div>
                 </div>
             </div>
         </div>`,
@@ -150,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="canvas-block demo-stats-block" data-type="stats">
             <div class="canvas-block-controls">
                 <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn dup-block-btn" title="Duplicate Block"><i class="fas fa-copy"></i></button>
                 <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
                 <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
                 <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
@@ -159,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Volume Built</p>
             </div>
             <div class="stat-card">
-                <h2>99.9%</h2>
+                <h2>99.99%</h2>
                 <p>Uptime Score</p>
             </div>
             <div class="stat-card">
@@ -176,22 +207,23 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="canvas-block demo-pricing-block" data-type="pricing">
             <div class="canvas-block-controls">
                 <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn dup-block-btn" title="Duplicate Block"><i class="fas fa-copy"></i></button>
                 <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
                 <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
                 <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
             </div>
             <div class="demo-price-card">
-                <h4 style="font-weight: 600;">Starter</h4>
-                <h2 style="font-size: 2rem; margin: 0.75rem 0;">$29<span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 400;">/mo</span></h2>
-                <p style="font-size: 0.825rem; color: var(--text-secondary);">Essential site builder and export suite.</p>
-                <button class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 1.25rem;">Choose Plan</button>
+                <h4 style="font-weight: 700;">Starter</h4>
+                <h2 style="font-size: 2.25rem; margin: 0.75rem 0;">$29<span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 400;">/mo</span></h2>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">Essential visual site builder and export suite.</p>
+                <button class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 1.35rem;">Choose Starter</button>
             </div>
-            <div class="demo-price-card" style="border-color: var(--apple-blue); background: rgba(41, 151, 255, 0.05);">
-                <span style="font-size: 0.7rem; font-weight: 600; color: var(--apple-blue); text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-bottom: 0.35rem;">MOST POPULAR</span>
-                <h4 style="font-weight: 600;">Pro Studio</h4>
-                <h2 style="font-size: 2rem; margin: 0.75rem 0;">$79<span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 400;">/mo</span></h2>
-                <p style="font-size: 0.825rem; color: var(--text-secondary);">Demoly Studio + full Webtools Suite.</p>
-                <button class="btn btn-blue btn-sm" style="width: 100%; margin-top: 1.25rem;">Choose Plan</button>
+            <div class="demo-price-card" style="border-color: var(--accent-cyan); background: rgba(0, 242, 254, 0.04);">
+                <span class="status-pulse" style="margin-bottom: 0.35rem; font-size: 0.7rem;">MOST POPULAR STUDIO TIER</span>
+                <h4 style="font-weight: 700;">Pro Architect</h4>
+                <h2 style="font-size: 2.25rem; margin: 0.75rem 0;">$79<span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 400;">/mo</span></h2>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">Demoly Studio + full Webtools & CSS Suite.</p>
+                <button class="btn btn-blue btn-sm" style="width: 100%; margin-top: 1.35rem;">Choose Pro</button>
             </div>
         </div>`,
 
@@ -199,14 +231,15 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="canvas-block demo-cta-block" data-type="cta">
             <div class="canvas-block-controls">
                 <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn dup-block-btn" title="Duplicate Block"><i class="fas fa-copy"></i></button>
                 <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
                 <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
                 <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
             </div>
-            <h2 style="font-size: 2.25rem; font-weight: 700; margin-bottom: 0.5rem;">Start Building with ZARO Demoly</h2>
-            <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 1.5rem; font-size: 0.95rem;">Join thousands of web architects crafting minimal, high-frequency websites.</p>
-            <div style="display: flex; gap: 0.5rem; max-width: 420px; margin: 0 auto;">
-                <input type="email" placeholder="Enter work email..." style="flex: 1; background: var(--apple-bg); border: 1px solid var(--apple-border); padding: 0.6rem 1rem; border-radius: var(--radius-full); color: #fff; font-size: 0.85rem;">
+            <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">Start Building with ZARO Demoly</h2>
+            <p style="color: var(--text-secondary); max-width: 520px; margin: 0 auto 1.65rem; font-size: 1rem;">Join thousands of web architects crafting minimal, high-frequency websites.</p>
+            <div style="display: flex; gap: 0.6rem; max-width: 440px; margin: 0 auto;">
+                <input type="email" placeholder="Enter work email..." style="flex: 1; background: var(--apple-bg); border: 1px solid var(--apple-border); padding: 0.65rem 1.1rem; border-radius: var(--radius-full); color: #fff; font-size: 0.875rem;">
                 <button class="btn btn-blue btn-sm">Get Started</button>
             </div>
         </div>`,
@@ -215,11 +248,12 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="canvas-block demo-faq-block" data-type="faq">
             <div class="canvas-block-controls">
                 <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn dup-block-btn" title="Duplicate Block"><i class="fas fa-copy"></i></button>
                 <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
                 <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
                 <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
             </div>
-            <h2 style="font-size: 1.75rem; text-align: center; margin-bottom: 1.5rem;">Frequently Asked Questions</h2>
+            <h2 style="font-size: 2rem; text-align: center; margin-bottom: 1.75rem; font-weight: 800;">Frequently Asked Questions</h2>
             <div class="faq-item active">
                 <div class="faq-question"><span>What is ZARO Demoly Studio?</span> <i class="fas fa-chevron-down"></i></div>
                 <div class="faq-answer">Demoly Studio is a browser-based visual website builder with instant clean HTML/CSS code export capabilities.</div>
@@ -231,19 +265,51 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>`,
 
         footer: `
-        <div class="canvas-block" data-type="footer" style="padding: 2.5rem 2rem; background: var(--apple-surface); border-top: 1px solid var(--apple-border-subtle);">
+        <div class="canvas-block" data-type="footer" style="padding: 2.75rem 2rem; background: var(--apple-surface); border-top: 1px solid var(--apple-border-subtle);">
             <div class="canvas-block-controls">
                 <button class="block-btn edit-block-btn" title="Edit Content"><i class="fas fa-edit"></i></button>
+                <button class="block-btn dup-block-btn" title="Duplicate Block"><i class="fas fa-copy"></i></button>
                 <button class="block-btn move-up-btn" title="Move Up"><i class="fas fa-arrow-up"></i></button>
                 <button class="block-btn move-down-btn" title="Move Down"><i class="fas fa-arrow-down"></i></button>
                 <button class="block-btn danger delete-block-btn" title="Delete Block"><i class="fas fa-trash"></i></button>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                <div style="font-weight: 600; font-size: 1.05rem;"><i class="fas fa-layer-group"></i> ZARO Demoly Studio</div>
-                <div style="font-size: 0.8rem; color: var(--text-secondary);">Copyright © 2026 ZARO Inc. All rights reserved.</div>
+                <div style="font-weight: 700; font-size: 1.1rem;"><i class="fas fa-cubes" style="color: var(--accent-cyan);"></i> ZARO Demoly Studio</div>
+                <div style="font-size: 0.85rem; color: var(--text-secondary);">Copyright © 2026 ZARO Inc. All rights reserved.</div>
             </div>
         </div>`
     };
+
+    // Helper: Toast Notifications
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        
+        let icon = '<i class="fas fa-info-circle" style="color: var(--accent-cyan);"></i>';
+        if (type === 'success' || type === 'blue') icon = '<i class="fas fa-check-circle" style="color: var(--accent-emerald);"></i>';
+        if (type === 'warning') icon = '<i class="fas fa-exclamation-triangle" style="color: var(--accent-amber);"></i>';
+
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(10px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Helper: Clipboard Copy
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Copied to clipboard!', 'success');
+        }).catch(() => {
+            showToast('Failed to copy', 'warning');
+        });
+    }
 
     // =========================================================================
     // 2. VIEW NAVIGATION & TAB SWITCHER
@@ -295,22 +361,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const rateFilterVal = document.getElementById('rateFilterVal');
     const categoryItems = document.querySelectorAll('#categoryFilterList .filter-item');
     const marketplaceSearch = document.getElementById('marketplaceSearch');
+    const toggleFavoritesBtn = document.getElementById('toggleFavoritesBtn');
+    let showFavoritesOnly = false;
 
     function renderFreelancerCard(f) {
+        const isFav = savedFavorites.includes(f.id);
         return `
         <div class="freelancer-card apple-card">
             <div>
-                <div class="freelancer-header">
-                    <img src="${f.avatar}" alt="${f.name}" class="avatar">
-                    <div class="freelancer-info">
-                        <h3>${f.name} ${f.verified ? '<i class="fas fa-check-circle" style="color:var(--apple-blue); font-size:0.8rem;"></i>' : ''}</h3>
-                        <p class="freelancer-role">${f.role}</p>
+                <div class="freelancer-card-top">
+                    <div style="display: flex; align-items: center; gap: 0.9rem;">
+                        <div class="freelancer-avatar-wrapper">
+                            <img src="${f.avatar}" alt="${f.name}" class="avatar">
+                            <span class="avatar-online-dot"></span>
+                        </div>
+                        <div class="freelancer-info">
+                            <h3 data-id="${f.id}" class="talent-name-click" style="cursor: pointer;">
+                                ${f.name} ${f.verified ? '<i class="fas fa-check-circle" style="color:var(--accent-cyan); font-size:0.85rem;"></i>' : ''}
+                            </h3>
+                            <p class="freelancer-role">${f.role}</p>
+                        </div>
                     </div>
+                    <button class="bookmark-btn ${isFav ? 'active' : ''}" data-id="${f.id}" title="${isFav ? 'Remove Favorite' : 'Save Favorite'}">
+                        <i class="${isFav ? 'fas' : 'far'} fa-star"></i>
+                    </button>
                 </div>
-                <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--apple-orange); margin-bottom: 0.65rem;">
+                <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.825rem; color: var(--accent-amber); margin-bottom: 0.65rem;">
                     <i class="fas fa-star"></i>
-                    <strong style="color: var(--text-primary);">${f.rating}</strong>
-                    <span style="color: var(--text-tertiary);">(${f.reviews} projects)</span>
+                    <strong style="color: var(--text-primary); font-size: 0.9rem;">${f.rating}</strong>
+                    <span style="color: var(--text-tertiary);">(${f.reviews} verified projects)</span>
                 </div>
                 <div class="tags-container">
                     ${f.tags.map(t => `<span class="skill-tag">${t}</span>`).join('')}
@@ -318,10 +397,11 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <div class="freelancer-footer">
-                <div class="rate">$${f.rate} <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 400;">/ hr</span></div>
-                <button class="btn btn-blue btn-sm hire-btn" data-name="${f.name}" data-role="${f.role}">
-                    Hire
-                </button>
+                <div class="rate">$${f.rate} <span style="font-size: 0.775rem; color: var(--text-secondary); font-weight: 400;">/ hr</span></div>
+                <div style="display: flex; gap: 0.4rem;">
+                    <button class="btn btn-secondary btn-sm profile-view-btn" data-id="${f.id}">Profile</button>
+                    <button class="btn btn-blue btn-sm hire-btn" data-name="${f.name}" data-role="${f.role}">Hire</button>
+                </div>
             </div>
         </div>`;
     }
@@ -338,15 +418,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const matchesSearch = f.name.toLowerCase().includes(searchQuery) ||
                 f.role.toLowerCase().includes(searchQuery) ||
                 f.tags.some(t => t.toLowerCase().includes(searchQuery));
-            return matchesRate && matchesCat && matchesSearch;
+            const matchesFav = !showFavoritesOnly || savedFavorites.includes(f.id);
+            return matchesRate && matchesCat && matchesSearch && matchesFav;
         });
 
-        freelancersGrid.innerHTML = filtered.map(renderFreelancerCard).join('');
+        freelancersGrid.innerHTML = filtered.length > 0 ? filtered.map(renderFreelancerCard).join('') : '<div style="padding: 3rem; text-align: center; color: var(--text-tertiary); grid-column: 1/-1;">No specialists matched your filter criteria.</div>';
         if (talentDirectoryGrid) {
             talentDirectoryGrid.innerHTML = FREELANCERS_DATA.map(renderFreelancerCard).join('');
         }
 
-        // Attach Hire Button Listeners
+        // Attach Card Action Event Listeners
         document.querySelectorAll('.hire-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const name = btn.getAttribute('data-name');
@@ -354,7 +435,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 openHireModal(name, role);
             });
         });
+
+        document.querySelectorAll('.profile-view-btn, .talent-name-click').forEach(el => {
+            el.addEventListener('click', () => {
+                const id = parseInt(el.getAttribute('data-id'));
+                const talent = FREELANCERS_DATA.find(f => f.id === id);
+                if (talent) openTalentModal(talent);
+            });
+        });
+
+        document.querySelectorAll('.bookmark-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.getAttribute('data-id'));
+                if (savedFavorites.includes(id)) {
+                    savedFavorites = savedFavorites.filter(favId => favId !== id);
+                    showToast('Removed from favorites', 'info');
+                } else {
+                    savedFavorites.push(id);
+                    showToast('Saved to favorites!', 'success');
+                }
+                localStorage.setItem('zaro_favorites', JSON.stringify(savedFavorites));
+                updateMarketplaceGrid();
+            });
+        });
     }
+
+    toggleFavoritesBtn?.addEventListener('click', () => {
+        showFavoritesOnly = !showFavoritesOnly;
+        toggleFavoritesBtn.classList.toggle('active', showFavoritesOnly);
+        toggleFavoritesBtn.innerHTML = showFavoritesOnly ? '<i class="fas fa-star" style="color:var(--accent-amber);"></i> Showing Favorites' : '<i class="far fa-star"></i> Saved Talent';
+        updateMarketplaceGrid();
+    });
 
     rateFilter?.addEventListener('input', (e) => {
         if (rateFilterVal) rateFilterVal.textContent = `$${e.target.value}/hr`;
@@ -375,7 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateMarketplaceGrid();
 
     // =========================================================================
-    // 4. DEMOLY VISUAL WEBSITE STUDIO ENGINE
+    // 4. DEMOLY VISUAL WEBSITE STUDIO ENGINE (WITH UNDO/REDO & LIVE CUSTOMIZER)
     // =========================================================================
 
     const builderCanvas = document.getElementById('builderCanvas');
@@ -383,26 +494,81 @@ document.addEventListener('DOMContentLoaded', () => {
     const blockPresetCards = document.querySelectorAll('.block-preset-card');
     const clearCanvasBtn = document.getElementById('clearCanvasBtn');
     const exportCodeBtn = document.getElementById('exportCodeBtn');
+    const undoBtn = document.getElementById('undoBtn');
+    const redoBtn = document.getElementById('redoBtn');
 
-    // Sidebar Tab Switching
+    // Sidebar Tab Switcher inside Studio
     const tabBlocksBtn = document.getElementById('tabBlocksBtn');
+    const tabCustomizerBtn = document.getElementById('tabCustomizerBtn');
     const tabThemesBtn = document.getElementById('tabThemesBtn');
     const sidebarBlocksContent = document.getElementById('sidebarBlocksContent');
+    const sidebarCustomizerContent = document.getElementById('sidebarCustomizerContent');
     const sidebarThemesContent = document.getElementById('sidebarThemesContent');
 
     tabBlocksBtn?.addEventListener('click', () => {
+        [tabBlocksBtn, tabCustomizerBtn, tabThemesBtn].forEach(b => b?.classList.remove('active'));
         tabBlocksBtn.classList.add('active');
-        tabThemesBtn.classList.remove('active');
         sidebarBlocksContent.style.display = 'block';
+        sidebarCustomizerContent.style.display = 'none';
+        sidebarThemesContent.style.display = 'none';
+    });
+
+    tabCustomizerBtn?.addEventListener('click', () => {
+        [tabBlocksBtn, tabCustomizerBtn, tabThemesBtn].forEach(b => b?.classList.remove('active'));
+        tabCustomizerBtn.classList.add('active');
+        sidebarCustomizerContent.style.display = 'block';
+        sidebarBlocksContent.style.display = 'none';
         sidebarThemesContent.style.display = 'none';
     });
 
     tabThemesBtn?.addEventListener('click', () => {
+        [tabBlocksBtn, tabCustomizerBtn, tabThemesBtn].forEach(b => b?.classList.remove('active'));
         tabThemesBtn.classList.add('active');
-        tabBlocksBtn.classList.remove('active');
         sidebarThemesContent.style.display = 'block';
         sidebarBlocksContent.style.display = 'none';
+        sidebarCustomizerContent.style.display = 'none';
     });
+
+    // Undo / Redo State Save
+    function saveCanvasSnapshot() {
+        const blocks = Array.from(builderCanvas.querySelectorAll('.canvas-block')).map(b => b.outerHTML);
+        canvasHistory = canvasHistory.slice(0, historyStep + 1);
+        canvasHistory.push(blocks);
+        historyStep++;
+    }
+
+    undoBtn?.addEventListener('click', () => {
+        if (historyStep > 0) {
+            historyStep--;
+            restoreCanvasSnapshot(canvasHistory[historyStep]);
+            showToast('Undo performed', 'info');
+        }
+    });
+
+    redoBtn?.addEventListener('click', () => {
+        if (historyStep < canvasHistory.length - 1) {
+            historyStep++;
+            restoreCanvasSnapshot(canvasHistory[historyStep]);
+            showToast('Redo performed', 'info');
+        }
+    });
+
+    function restoreCanvasSnapshot(snapshot) {
+        const currentBlocks = builderCanvas.querySelectorAll('.canvas-block');
+        currentBlocks.forEach(b => b.remove());
+        if (!snapshot || snapshot.length === 0) {
+            if (canvasEmptyState) canvasEmptyState.style.display = 'block';
+            return;
+        }
+        if (canvasEmptyState) canvasEmptyState.style.display = 'none';
+        snapshot.forEach(html => {
+            const temp = document.createElement('div');
+            temp.innerHTML = html.trim();
+            const el = temp.firstChild;
+            builderCanvas.appendChild(el);
+            attachBlockEventListeners(el);
+        });
+    }
 
     // Viewport Controls
     const vpDesktop = document.getElementById('vpDesktop');
@@ -449,11 +615,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         builderCanvas.appendChild(blockEl);
         attachBlockEventListeners(blockEl);
-        showToast(`Added ${blockType.toUpperCase()} block to Demoly Canvas!`, 'blue');
+        saveCanvasSnapshot();
+        showToast(`Added ${blockType.toUpperCase()} component block!`, 'blue');
     }
 
     function attachBlockEventListeners(blockEl) {
         const deleteBtn = blockEl.querySelector('.delete-block-btn');
+        const dupBtn = blockEl.querySelector('.dup-block-btn');
         const moveUpBtn = blockEl.querySelector('.move-up-btn');
         const moveDownBtn = blockEl.querySelector('.move-down-btn');
         const editBtn = blockEl.querySelector('.edit-block-btn');
@@ -463,18 +631,29 @@ document.addEventListener('DOMContentLoaded', () => {
             if (builderCanvas.children.length <= 1) {
                 if (canvasEmptyState) canvasEmptyState.style.display = 'block';
             }
-            showToast('Block removed from canvas.', 'info');
+            saveCanvasSnapshot();
+            showToast('Block deleted.', 'info');
+        });
+
+        dupBtn?.addEventListener('click', () => {
+            const clone = blockEl.cloneNode(true);
+            blockEl.parentNode.insertBefore(clone, blockEl.nextSibling);
+            attachBlockEventListeners(clone);
+            saveCanvasSnapshot();
+            showToast('Block duplicated!', 'blue');
         });
 
         moveUpBtn?.addEventListener('click', () => {
             if (blockEl.previousElementSibling && blockEl.previousElementSibling !== canvasEmptyState) {
                 builderCanvas.insertBefore(blockEl, blockEl.previousElementSibling);
+                saveCanvasSnapshot();
             }
         });
 
         moveDownBtn?.addEventListener('click', () => {
             if (blockEl.nextElementSibling) {
                 builderCanvas.insertBefore(blockEl.nextElementSibling, blockEl);
+                saveCanvasSnapshot();
             }
         });
 
@@ -482,13 +661,62 @@ document.addEventListener('DOMContentLoaded', () => {
             openBlockEditorModal(blockEl);
         });
 
-        // FAQ accordion item toggle
+        // FAQ accordion toggle
         blockEl.querySelectorAll('.faq-item').forEach(item => {
             item.addEventListener('click', () => {
                 item.classList.toggle('active');
             });
         });
     }
+
+    // Live Customizer Inputs
+    const customizerAccentColor = document.getElementById('customizerAccentColor');
+    const customizerRadiusInput = document.getElementById('customizerRadiusInput');
+    const customizerRadiusVal = document.getElementById('customizerRadiusVal');
+    const customizerFontSelect = document.getElementById('customizerFontSelect');
+
+    customizerAccentColor?.addEventListener('input', (e) => {
+        const color = e.target.value;
+        builderCanvas.querySelectorAll('.demo-hero-title, h1, h2, h3').forEach(el => el.style.color = color);
+        showToast('Updated canvas title accent color', 'info');
+    });
+
+    customizerRadiusInput?.addEventListener('input', (e) => {
+        const rad = `${e.target.value}px`;
+        if (customizerRadiusVal) customizerRadiusVal.textContent = rad;
+        builderCanvas.querySelectorAll('.demo-feature-card, .demo-price-card, .testimonial-card').forEach(el => el.style.borderRadius = rad);
+    });
+
+    customizerFontSelect?.addEventListener('change', (e) => {
+        builderCanvas.style.fontFamily = e.target.value;
+        showToast('Canvas typography updated', 'blue');
+    });
+
+    // Fullscreen Live Preview Mode Logic
+    const toggleLivePreviewBtn = document.getElementById('toggleLivePreviewBtn');
+    const previewModeOverlay = document.getElementById('previewModeOverlay');
+    const previewContainer = document.getElementById('previewContainer');
+    const closePreviewModeBtn = document.getElementById('closePreviewModeBtn');
+
+    toggleLivePreviewBtn?.addEventListener('click', () => {
+        const blocks = builderCanvas.querySelectorAll('.canvas-block');
+        if (blocks.length === 0) {
+            showToast('Add components to canvas before launching live preview!', 'warning');
+            return;
+        }
+        previewContainer.innerHTML = '';
+        blocks.forEach(b => {
+            const clone = b.cloneNode(true);
+            const controls = clone.querySelector('.canvas-block-controls');
+            if (controls) controls.remove();
+            previewContainer.appendChild(clone);
+        });
+        previewModeOverlay.classList.add('active');
+    });
+
+    closePreviewModeBtn?.addEventListener('click', () => {
+        previewModeOverlay.classList.remove('active');
+    });
 
     // Inline Block Editor Modal Logic
     const editBlockModal = document.getElementById('editBlockModal');
@@ -534,14 +762,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         editBlockModal.classList.remove('active');
+        saveCanvasSnapshot();
         showToast('Block content updated live on canvas!', 'blue');
     });
 
-    // Preset Page Layout Loaders
+    // Preset Layout Loaders
     document.getElementById('loadSaasPresetBtn')?.addEventListener('click', () => {
         const blocks = builderCanvas.querySelectorAll('.canvas-block');
         blocks.forEach(b => b.remove());
-        ['navbar', 'hero', 'features', 'testimonials', 'cta', 'footer'].forEach(type => addBlockToCanvas(type));
+        ['navbar', 'hero', 'features', 'techstack', 'testimonials', 'cta', 'footer'].forEach(type => addBlockToCanvas(type));
         showToast('Loaded SaaS Landing Page Preset!', 'blue');
     });
 
@@ -556,6 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const blocks = builderCanvas.querySelectorAll('.canvas-block');
         blocks.forEach(b => b.remove());
         if (canvasEmptyState) canvasEmptyState.style.display = 'block';
+        saveCanvasSnapshot();
         showToast('Demoly Canvas cleared.', 'info');
     });
 
@@ -570,21 +800,24 @@ document.addEventListener('DOMContentLoaded', () => {
             if (theme === 'cyan-dark') {
                 builderCanvas.style.background = '#000000';
             } else if (theme === 'violet-dark') {
-                builderCanvas.style.background = '#110e1b';
+                builderCanvas.style.background = '#0f0a1c';
             } else if (theme === 'emerald-dark') {
-                builderCanvas.style.background = '#07140e';
-            } else if (theme === 'pink-dark') {
-                builderCanvas.style.background = '#170a0e';
+                builderCanvas.style.background = '#05140c';
+            } else if (theme === 'amber-dark') {
+                builderCanvas.style.background = '#190e05';
             }
             showToast(`Applied ${swatch.textContent.trim()} Theme`, 'blue');
         });
     });
 
+    // Initialize Canvas snapshot
+    saveCanvasSnapshot();
+
     // =========================================================================
-    // 5. WEB TOOLS ENGINE
+    // 5. WEB TOOLS ENGINE (GLASS, SHADOW, MESH, PALETTE, FLEX, GRID)
     // =========================================================================
 
-    // Glassmorphism Generator
+    // Tool 1: Glassmorphism Generator
     const blurInput = document.getElementById('blurInput');
     const opacityInput = document.getElementById('opacityInput');
     const radiusInput = document.getElementById('radiusInput');
@@ -610,7 +843,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     [blurInput, opacityInput, radiusInput].forEach(inp => inp?.addEventListener('input', updateGlassmorphism));
 
-    // Shadow Generator
+    // Tool 2: Shadow Generator
     const shadowBlurInput = document.getElementById('shadowBlurInput');
     const shadowSpreadInput = document.getElementById('shadowSpreadInput');
     const shadowPreviewBox = document.getElementById('shadow-preview-box');
@@ -631,7 +864,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     [shadowBlurInput, shadowSpreadInput].forEach(inp => inp?.addEventListener('input', updateShadow));
 
-    // Gradient Mesh Generator
+    // Tool 3: Gradient Mesh Generator
     const gradColor1 = document.getElementById('gradColor1');
     const gradColor2 = document.getElementById('gradColor2');
     const gradAngleInput = document.getElementById('gradAngleInput');
@@ -653,7 +886,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     [gradColor1, gradColor2, gradAngleInput].forEach(inp => inp?.addEventListener('input', updateGradient));
 
-    // Tool 5: Titanium Color Palette Studio
+    // Tool 5: Palette Studio
     const randomizePaletteBtn = document.getElementById('randomizePaletteBtn');
     const paletteGrid = document.getElementById('paletteGrid');
     const paletteCssCode = document.getElementById('paletteCssCode');
@@ -671,8 +904,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function generateRandomPalette() {
         if (!paletteGrid) return;
         const colors = [
-            '#000000',
-            '#161617',
+            '#030305',
+            '#0d0d11',
             getRandomColor(),
             getRandomColor(),
             getRandomColor()
@@ -686,7 +919,7 @@ document.addEventListener('DOMContentLoaded', () => {
             chip.textContent = hex;
         });
 
-        const css = `--bg: ${colors[0]}; --surface: ${colors[1]}; --accent-1: ${colors[2]}; --accent-2: ${colors[3]}; --accent-3: ${colors[4]};`;
+        const css = `--bg: ${colors[0]}; --surface: ${colors[1]}; --primary: ${colors[2]}; --accent: ${colors[3]}; --highlight: ${colors[4]};`;
         if (paletteCssCode) paletteCssCode.textContent = css;
     }
 
@@ -703,7 +936,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (paletteCssCode) copyToClipboard(paletteCssCode.textContent);
     });
 
-    // Tool 6: Flexbox & Alignment Studio
+    // Tool 6: Flexbox Studio
     const flexDirSelect = document.getElementById('flexDirSelect');
     const flexJustifySelect = document.getElementById('flexJustifySelect');
     const flexStage = document.getElementById('flexStage');
@@ -728,24 +961,45 @@ document.addEventListener('DOMContentLoaded', () => {
         if (flexCssCode) copyToClipboard(flexCssCode.textContent);
     });
 
-    // Audit Calculator
+    // Tool 7: CSS Grid Generator Studio
+    const gridColsInput = document.getElementById('gridColsInput');
+    const gridGapInput = document.getElementById('gridGapInput');
+    const gridPreviewStage = document.getElementById('gridPreviewStage');
+    const gridCssCode = document.getElementById('gridCssCode');
+    const copyGridCodeBtn = document.getElementById('copyGridCodeBtn');
+
+    function updateGridStage() {
+        if (!gridPreviewStage) return;
+        const cols = gridColsInput.value;
+        const gap = gridGapInput.value;
+
+        document.getElementById('gridColsVal').textContent = cols;
+        document.getElementById('gridGapVal').textContent = `${gap}px`;
+
+        gridPreviewStage.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        gridPreviewStage.style.gap = `${gap}px`;
+
+        const css = `display: grid; grid-template-columns: repeat(${cols}, 1fr); gap: ${gap}px;`;
+        if (gridCssCode) gridCssCode.textContent = css;
+    }
+
+    [gridColsInput, gridGapInput].forEach(inp => inp?.addEventListener('input', updateGridStage));
+    copyGridCodeBtn?.addEventListener('click', () => {
+        if (gridCssCode) copyToClipboard(gridCssCode.textContent);
+    });
+
+    // Audit Inspector Simulator
     document.getElementById('runAuditBtn')?.addEventListener('click', () => {
-        showToast('Running Web Audit Inspector...', 'blue');
+        showToast('Running Inspector Audit...', 'blue');
         setTimeout(() => {
-            showToast('Audit complete! Scores verified.', 'blue');
-        }, 500);
+            showToast('Audit complete! Scores verified 100/100.', 'success');
+        }, 600);
     });
 
     // Copy Code Buttons
-    document.getElementById('copyGlassCodeBtn')?.addEventListener('click', () => {
-        copyToClipboard(glassCssCode.textContent);
-    });
-    document.getElementById('copyShadowCodeBtn')?.addEventListener('click', () => {
-        copyToClipboard(shadowCssCode.textContent);
-    });
-    document.getElementById('copyGradCodeBtn')?.addEventListener('click', () => {
-        copyToClipboard(gradCssCode.textContent);
-    });
+    document.getElementById('copyGlassCodeBtn')?.addEventListener('click', () => copyToClipboard(glassCssCode.textContent));
+    document.getElementById('copyShadowCodeBtn')?.addEventListener('click', () => copyToClipboard(shadowCssCode.textContent));
+    document.getElementById('copyGradCodeBtn')?.addEventListener('click', () => copyToClipboard(gradCssCode.textContent));
 
     // =========================================================================
     // 6. EXPORT CODE & MODALS
@@ -779,13 +1033,8 @@ document.addEventListener('DOMContentLoaded', () => {
         exportModal.classList.add('active');
     });
 
-    closeExportModalBtn?.addEventListener('click', () => {
-        exportModal.classList.remove('active');
-    });
-
-    copyExportedCodeBtn?.addEventListener('click', () => {
-        copyToClipboard(exportedCodeTextarea.value);
-    });
+    closeExportModalBtn?.addEventListener('click', () => exportModal.classList.remove('active'));
+    copyExportedCodeBtn?.addEventListener('click', () => copyToClipboard(exportedCodeTextarea.value));
 
     downloadCodeBtn?.addEventListener('click', () => {
         const blob = new Blob([exportedCodeTextarea.value], { type: 'text/html' });
@@ -798,93 +1047,67 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('Downloaded demoly-site.html', 'blue');
     });
 
-    // Proposal / Hire Modal
+    // Hire Proposal Modal Logic
     const hireModal = document.getElementById('hireModal');
     const closeHireModalBtn = document.getElementById('closeHireModalBtn');
-    const hireModalSub = document.getElementById('hireModalSub');
     const submitProposalBtn = document.getElementById('submitProposalBtn');
+    const hireModalSub = document.getElementById('hireModalSub');
 
     function openHireModal(name, role) {
-        if (hireModalSub) {
-            hireModalSub.textContent = `Send proposal to ${name} (${role})`;
-        }
+        if (hireModalSub) hireModalSub.textContent = `Send direct proposal to ${name} (${role})`;
         hireModal.classList.add('active');
     }
 
-    closeHireModalBtn?.addEventListener('click', () => {
-        hireModal.classList.remove('active');
-    });
-
+    closeHireModalBtn?.addEventListener('click', () => hireModal.classList.remove('active'));
     submitProposalBtn?.addEventListener('click', () => {
         hireModal.classList.remove('active');
-        showToast('Proposal submitted! Specialist notified.', 'blue');
+        showToast('Proposal submitted successfully!', 'success');
+    });
+
+    // Talent Detail Modal Logic
+    const talentModal = document.getElementById('talentModal');
+    const closeTalentModalBtn = document.getElementById('closeTalentModalBtn');
+    const talentModalAvatar = document.getElementById('talentModalAvatar');
+    const talentModalName = document.getElementById('talentModalName');
+    const talentModalRole = document.getElementById('talentModalRole');
+    const talentModalRate = document.getElementById('talentModalRate');
+    const talentModalRating = document.getElementById('talentModalRating');
+    const talentModalProjects = document.getElementById('talentModalProjects');
+    const talentModalTags = document.getElementById('talentModalTags');
+    const talentModalHireBtn = document.getElementById('talentModalHireBtn');
+    let activeModalTalent = null;
+
+    function openTalentModal(t) {
+        activeModalTalent = t;
+        if (talentModalAvatar) talentModalAvatar.src = t.avatar;
+        if (talentModalName) talentModalName.textContent = t.name;
+        if (talentModalRole) talentModalRole.textContent = t.role;
+        if (talentModalRate) talentModalRate.textContent = `$${t.rate}/hr`;
+        if (talentModalRating) talentModalRating.textContent = `${t.rating}★`;
+        if (talentModalProjects) talentModalProjects.textContent = t.reviews;
+        if (talentModalTags) {
+            talentModalTags.innerHTML = t.tags.map(tag => `<span class="skill-tag">${tag}</span>`).join('');
+        }
+        talentModal.classList.add('active');
+    }
+
+    closeTalentModalBtn?.addEventListener('click', () => talentModal.classList.remove('active'));
+    talentModalHireBtn?.addEventListener('click', () => {
+        talentModal.classList.remove('active');
+        if (activeModalTalent) openHireModal(activeModalTalent.name, activeModalTalent.role);
     });
 
     // Post Project Modal Logic
     const postProjectModal = document.getElementById('postProjectModal');
+    const postJobBtn = document.getElementById('postJobBtn');
     const closePostProjectModalBtn = document.getElementById('closePostProjectModalBtn');
     const submitPostProjectBtn = document.getElementById('submitPostProjectBtn');
-    const postJobBtn = document.getElementById('postJobBtn');
 
-    postJobBtn?.addEventListener('click', () => {
-        postProjectModal?.classList.add('active');
-    });
-
-    closePostProjectModalBtn?.addEventListener('click', () => {
-        postProjectModal?.classList.remove('active');
-    });
-
+    postJobBtn?.addEventListener('click', () => postProjectModal.classList.add('active'));
+    closePostProjectModalBtn?.addEventListener('click', () => postProjectModal.classList.remove('active'));
     submitPostProjectBtn?.addEventListener('click', () => {
-        const title = document.getElementById('postTitleInput')?.value || 'New Project Requirement';
-        const category = document.getElementById('postCategorySelect')?.value || 'fullstack';
-        const budget = document.getElementById('postBudgetInput')?.value || 2500;
-        const skillsText = document.getElementById('postSkillsInput')?.value || 'Demoly, CSS3';
-
-        const newListing = {
-            id: Date.now(),
-            name: title,
-            role: `Open Project ($${budget} Budget)`,
-            rating: 5.0,
-            reviews: 1,
-            rate: Math.round(budget / 20),
-            category: category,
-            avatar: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=300&q=80",
-            tags: skillsText.split(',').map(s => s.trim()),
-            verified: true
-        };
-
-        FREELANCERS_DATA.unshift(newListing);
-        updateMarketplaceGrid();
-
-        postProjectModal?.classList.remove('active');
-        showToast('Project published to Marketplace stream!', 'blue');
+        postProjectModal.classList.remove('active');
+        showToast('Project requirement published to ZARO network!', 'success');
     });
-
-    // =========================================================================
-    // 7. UTILITY FUNCTIONS
-    // =========================================================================
-
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            showToast('Copied code to clipboard!', 'blue');
-        }).catch(() => {
-            showToast('Failed to copy text', 'danger');
-        });
-    }
-
-    function showToast(msg, type = 'blue') {
-        const container = document.getElementById('toast-container');
-        if (!container) return;
-
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = `<i class="fas fa-check-circle" style="color:var(--apple-blue)"></i> <span>${msg}</span>`;
-
-        container.appendChild(toast);
-
-        setTimeout(() => {
-            toast.remove();
-        }, 2800);
-    }
 
 });
