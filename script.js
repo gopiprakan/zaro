@@ -5,6 +5,68 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // =========================================================================
+    // 0. HIGH-PRECISION 60 FPS PERFORMANCE ENGINE & EVENT SCHEDULERS
+    // =========================================================================
+
+    // Utility: RequestAnimationFrame Throttle to lock DOM updates to 60 FPS
+    function rafThrottle(fn) {
+        let ticking = false;
+        return function (...args) {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    fn.apply(this, args);
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+    }
+
+    // Utility: Micro-debounce for search & high-frequency text input
+    function debounce(fn, delay = 40) {
+        let timer = null;
+        return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => fn.apply(this, args), delay);
+        };
+    }
+
+    // Real-Time High-Precision FPS Engine & Performance Monitor
+    let frameCount = 0;
+    let lastFpsTime = performance.now();
+    const fpsTextEl = document.getElementById('fpsText');
+    const fpsBadgeEl = document.getElementById('fpsBadge');
+
+    function updateFPSLoop() {
+        const now = performance.now();
+        frameCount++;
+
+        if (now - lastFpsTime >= 1000) {
+            const currentFps = Math.min(60, Math.round((frameCount * 1000) / (now - lastFpsTime)));
+            if (fpsTextEl) {
+                fpsTextEl.textContent = `${currentFps} FPS`;
+            }
+            if (fpsBadgeEl) {
+                if (currentFps >= 54) {
+                    fpsBadgeEl.style.color = 'var(--accent-emerald)';
+                    fpsBadgeEl.style.borderColor = 'rgba(48, 209, 88, 0.3)';
+                } else if (currentFps >= 38) {
+                    fpsBadgeEl.style.color = 'var(--accent-amber)';
+                    fpsBadgeEl.style.borderColor = 'rgba(255, 159, 10, 0.3)';
+                } else {
+                    fpsBadgeEl.style.color = 'var(--accent-rose)';
+                    fpsBadgeEl.style.borderColor = 'rgba(255, 59, 48, 0.3)';
+                }
+            }
+            frameCount = 0;
+            lastFpsTime = now;
+        }
+
+        requestAnimationFrame(updateFPSLoop);
+    }
+    requestAnimationFrame(updateFPSLoop);
+
+    // =========================================================================
     // 1. DATA & STATE MANAGEMENT
     // =========================================================================
 
@@ -460,27 +522,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const rafUpdateMarketplaceGrid = rafThrottle(updateMarketplaceGrid);
+    const debouncedSearch = debounce(rafUpdateMarketplaceGrid, 30);
+
     toggleFavoritesBtn?.addEventListener('click', () => {
         showFavoritesOnly = !showFavoritesOnly;
         toggleFavoritesBtn.classList.toggle('active', showFavoritesOnly);
         toggleFavoritesBtn.innerHTML = showFavoritesOnly ? '<i class="fas fa-star" style="color:var(--accent-amber);"></i> Showing Favorites' : '<i class="far fa-star"></i> Saved Talent';
-        updateMarketplaceGrid();
+        rafUpdateMarketplaceGrid();
     });
 
-    rateFilter?.addEventListener('input', (e) => {
+    rateFilter?.addEventListener('input', rafThrottle((e) => {
         if (rateFilterVal) rateFilterVal.textContent = `$${e.target.value}/hr`;
-        updateMarketplaceGrid();
-    });
+        rafUpdateMarketplaceGrid();
+    }));
 
     categoryItems.forEach(item => {
         item.addEventListener('click', () => {
             categoryItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
-            updateMarketplaceGrid();
+            rafUpdateMarketplaceGrid();
         });
     });
 
-    marketplaceSearch?.addEventListener('input', updateMarketplaceGrid);
+    marketplaceSearch?.addEventListener('input', debouncedSearch);
 
     // Initial render
     updateMarketplaceGrid();
@@ -675,17 +740,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const customizerRadiusVal = document.getElementById('customizerRadiusVal');
     const customizerFontSelect = document.getElementById('customizerFontSelect');
 
-    customizerAccentColor?.addEventListener('input', (e) => {
+    customizerAccentColor?.addEventListener('input', rafThrottle((e) => {
         const color = e.target.value;
         builderCanvas.querySelectorAll('.demo-hero-title, h1, h2, h3').forEach(el => el.style.color = color);
         showToast('Updated canvas title accent color', 'info');
-    });
+    }));
 
-    customizerRadiusInput?.addEventListener('input', (e) => {
+    customizerRadiusInput?.addEventListener('input', rafThrottle((e) => {
         const rad = `${e.target.value}px`;
         if (customizerRadiusVal) customizerRadiusVal.textContent = rad;
         builderCanvas.querySelectorAll('.demo-feature-card, .demo-price-card, .testimonial-card').forEach(el => el.style.borderRadius = rad);
-    });
+    }));
 
     customizerFontSelect?.addEventListener('change', (e) => {
         builderCanvas.style.fontFamily = e.target.value;
@@ -841,7 +906,7 @@ document.addEventListener('DOMContentLoaded', () => {
         glassCssCode.textContent = css;
     }
 
-    [blurInput, opacityInput, radiusInput].forEach(inp => inp?.addEventListener('input', updateGlassmorphism));
+    [blurInput, opacityInput, radiusInput].forEach(inp => inp?.addEventListener('input', rafThrottle(updateGlassmorphism)));
 
     // Tool 2: Shadow Generator
     const shadowBlurInput = document.getElementById('shadowBlurInput');
@@ -862,7 +927,7 @@ document.addEventListener('DOMContentLoaded', () => {
         shadowCssCode.textContent = css;
     }
 
-    [shadowBlurInput, shadowSpreadInput].forEach(inp => inp?.addEventListener('input', updateShadow));
+    [shadowBlurInput, shadowSpreadInput].forEach(inp => inp?.addEventListener('input', rafThrottle(updateShadow)));
 
     // Tool 3: Gradient Mesh Generator
     const gradColor1 = document.getElementById('gradColor1');
@@ -884,7 +949,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gradCssCode.textContent = css;
     }
 
-    [gradColor1, gradColor2, gradAngleInput].forEach(inp => inp?.addEventListener('input', updateGradient));
+    [gradColor1, gradColor2, gradAngleInput].forEach(inp => inp?.addEventListener('input', rafThrottle(updateGradient)));
 
     // Tool 5: Palette Studio
     const randomizePaletteBtn = document.getElementById('randomizePaletteBtn');
@@ -983,7 +1048,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (gridCssCode) gridCssCode.textContent = css;
     }
 
-    [gridColsInput, gridGapInput].forEach(inp => inp?.addEventListener('input', updateGridStage));
+    [gridColsInput, gridGapInput].forEach(inp => inp?.addEventListener('input', rafThrottle(updateGridStage)));
     copyGridCodeBtn?.addEventListener('click', () => {
         if (gridCssCode) copyToClipboard(gridCssCode.textContent);
     });
