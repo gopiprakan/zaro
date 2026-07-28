@@ -49,8 +49,9 @@
     --glow-cyan: 0 0 30px rgba(0, 242, 254, 0.25);
     --glow-purple: 0 0 35px rgba(175, 82, 222, 0.25);
 
-    --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    --transition-fast: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Hardware Accelerated Specific Transitions */
+    --transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-fast: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease, border-color 0.15s ease;
 }
 
 /* ==========================================================================
@@ -67,6 +68,7 @@ html {
     scroll-behavior: smooth;
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
 body {
@@ -77,9 +79,10 @@ body {
     overflow-x: hidden;
     min-height: 100vh;
     position: relative;
+    contain: layout style;
 }
 
-/* Subtle Ambient Glow Background Orbs */
+/* Subtle Ambient Glow Background Orbs - GPU Accelerated Composite Layers */
 body::before {
     content: '';
     position: fixed;
@@ -91,6 +94,8 @@ body::before {
     filter: blur(80px);
     pointer-events: none;
     z-index: 0;
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 body::after {
@@ -104,6 +109,8 @@ body::after {
     filter: blur(100px);
     pointer-events: none;
     z-index: 0;
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 main {
@@ -146,6 +153,43 @@ button, input, select, textarea {
 }
 
 /* ==========================================================================
+   FPS Engine Status Indicator
+   ========================================================================== */
+
+.fps-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--apple-border-subtle);
+    font-size: 0.775rem;
+    font-weight: 700;
+    color: var(--accent-emerald);
+    letter-spacing: 0.03em;
+    user-select: none;
+    will-change: transform;
+    transform: translateZ(0);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.fps-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--accent-emerald);
+    box-shadow: 0 0 10px var(--accent-emerald);
+    animation: fpsPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes fpsPulse {
+    0% { transform: scale(0.9); opacity: 0.7; }
+    100% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 14px var(--accent-emerald); }
+}
+
+/* ==========================================================================
    Apple Cards & Glassmorphism Utilities
    ========================================================================== */
 
@@ -159,6 +203,9 @@ button, input, select, textarea {
     transition: var(--transition);
     position: relative;
     overflow: hidden;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    contain: paint layout;
 }
 
 .apple-card::before {
@@ -175,7 +222,7 @@ button, input, select, textarea {
 .apple-card:hover {
     background: var(--apple-card-hover);
     border-color: var(--apple-border);
-    transform: translateY(-4px);
+    transform: translateY(-4px) translateZ(0);
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
 }
 
@@ -195,6 +242,8 @@ button, input, select, textarea {
     white-space: nowrap;
     position: relative;
     user-select: none;
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 .btn-primary, .btn-blue {
